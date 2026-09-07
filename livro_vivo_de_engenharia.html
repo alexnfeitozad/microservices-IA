@@ -2631,7 +2631,7 @@ implementa detalhes técnicos (ex: ProductRepository com EF Core)
 2.5 Value Objects                  ✅
 2.6 Relacionamentos                ✅
 2.7 Abstrações necessárias         ✅
-2.8 Testando o domínio             ⬅️ PRÓXIMO
+2.8 Testando o domínio             ✅
                         </pre>
                     </div>
                     <div class="mental-flow-strip" style="margin-top:1rem;">
@@ -2647,9 +2647,11 @@ implementa detalhes técnicos (ex: ProductRepository com EF Core)
                         <span class="flow-arrow">→</span>
                         <span class="flow-step">2.6 Relacionamentos ✅</span>
                         <span class="flow-arrow">→</span>
-                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">2.7 Abstrações necessárias ✅</span>
+                        <span class="flow-step">2.7 Abstrações necessárias ✅</span>
                         <span class="flow-arrow">→</span>
-                        <span class="flow-step" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">2.8 Testando o domínio ⬅️ PRÓXIMO</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">2.8 Testando o domínio ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">3.1 Criando o projeto Application ⬅️ PRÓXIMO</span>
                     </div>
                 </div>
 
@@ -2663,8 +2665,202 @@ implementa detalhes técnicos (ex: ProductRepository com EF Core)
                 </div>
             </article>
 
+            <article class="page-section" id="cap-02-sec-08">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 2 • DOMÍNIO</span>
+                        <h2 style="margin:0.25rem 0 0 0;">2.8 Testando o domínio</h2>
+                    </div>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Construção da suíte de testes unitários automatizados em xUnit para validar o comportamento, as invariantes e a auto-proteção das entidades de domínio.</p>
+                </div>
+
+                <h3>ESTRUTURA DO PROJETO DE TESTES</h3>
+                <p>Para garantir que o domínio puro opere exatamente conforme as regras de negócio especificadas e protegido contra regressões, criamos o projeto de testes unitários:</p>
+                <ul>
+                    <li><code>Catalog.UnitTests</code> (projeto de testes em .NET 10 com xUnit)</li>
+                </ul>
+
+                <p>O projeto de testes referencia diretamente o domínio:</p>
+
+                <div class="diagram-container" style="background:#ffffff; max-width:480px; margin:1rem auto; text-align:center;">
+                    <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.95rem; line-height:1.6; color:var(--text-heading);">
+Catalog.UnitTests
+       ↓ (referência de projeto)
+Catalog.Domain
+                    </pre>
+                </div>
+
+                <p>A direção da dependência é estritamente unidirecional: <strong>os testes dependem do domínio, mas o domínio não possui nenhuma dependência dos testes</strong>, preservando seu isolamento e pureza.</p>
+
+                <h3>ESTRATÉGIA DE TESTES & PADRÃO AAA</h3>
+                <p>Os testes unitários foram estruturados para <strong>verificar comportamentos e invariantes</strong> das entidades, e não simplesmente linhas de código para bater metas cegas de cobertura métrica.</p>
+                <p>Adotamos o padrão clássico <strong>AAA (Arrange, Act, Assert)</strong> em todos os cenários de teste:</p>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:1rem; margin:1rem 0;">
+                    <div style="background:#eff6ff; border:1px solid var(--primary); border-radius:6px; padding:0.9rem;">
+                        <div style="font-weight:700; color:var(--primary); margin-bottom:0.35rem;">1. Arrange</div>
+                        <p style="font-size:0.85rem; margin:0; line-height:1.4;">
+                            <strong>Preparar o cenário:</strong> instanciar dados válidos ou parâmetros limites para o teste.
+                        </p>
+                    </div>
+                    <div style="background:#fef3c7; border:1px solid #f59e0b; border-radius:6px; padding:0.9rem;">
+                        <div style="font-weight:700; color:#b45309; margin-bottom:0.35rem;">2. Act</div>
+                        <p style="font-size:0.85rem; margin:0; line-height:1.4;">
+                            <strong>Executar o comportamento:</strong> invocar o construtor ou o método de alteração da entidade.
+                        </p>
+                    </div>
+                    <div style="background:#ecfdf5; border:1px solid #10b981; border-radius:6px; padding:0.9rem;">
+                        <div style="font-weight:700; color:#065f46; margin-bottom:0.35rem;">3. Assert</div>
+                        <p style="font-size:0.85rem; margin:0; line-height:1.4;">
+                            <strong>Verificar o resultado:</strong> assegurar o estado consistente ou a exceção esperada.
+                        </p>
+                    </div>
+                </div>
+
+                <h3>COMPORTAMENTOS TESTADOS NO DOMÍNIO</h3>
+                <p>A suíte de testes unitários cobre integralmente as invariantes de cada entidade:</p>
+
+                <h4>1. Testes da Entidade Product (Catalog.UnitTests/Entities/ProductTests.cs)</h4>
+                <ul>
+                    <li><strong>Criação com dados válidos:</strong> instanciação com todos os dados obrigatórios e verificação da atribuição de identidade e estado.</li>
+                    <li><strong>Rejeição de preço negativo:</strong> o construtor lança exceção ao receber preço menor que zero.</li>
+                    <li><strong>Atualização de preço:</strong> alteração segura através de método de domínio refletindo o novo valor no estado.</li>
+                    <li><strong>Rejeição de preço negativo durante atualização:</strong> tentativa de alteração para valor negativo lança exceção imediatamente.</li>
+                    <li><strong>Preservação do estado anterior:</strong> quando uma atualização inválida é rejeitada, o estado anterior da entidade permanece 100% íntegro e inalterado.</li>
+                </ul>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Exemplo de Teste no Padrão AAA (ProductTests.cs)</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>[Fact]
+public void UpdatePrice_WithNegativePrice_ThrowsArgumentOutOfRangeException()
+{
+    // Arrange: cenário com produto válido
+    var product = new Product(Guid.NewGuid(), "Running Shoes", "Desc", 199.90m, "shoes.png", 1, 2);
+
+    // Act & Assert: execução e verificação da exceção esperada
+    var exception = Assert.Throws&lt;ArgumentOutOfRangeException&gt;(() =&gt;
+        product.UpdatePrice(-50m));
+
+    Assert.Equal("price", exception.ParamName);
+    Assert.Equal(199.90m, product.Price); // Estado anterior preservado
+}</code></pre>
+                </div>
+
+                <h4>2. Testes da Entidade Brand (BrandTests.cs)</h4>
+                <ul>
+                    <li><strong>Criação válida:</strong> instanciação correta com identificador positivo e nome.</li>
+                    <li><strong>Rejeição de nome vazio:</strong> nomes nulos, vazios ou apenas com espaços em branco lançam <code>ArgumentException</code>.</li>
+                    <li><strong>Atualização do nome:</strong> alteração protegida que valida o novo nome antes de persistir no estado.</li>
+                </ul>
+
+                <h4>3. Testes da Entidade CatalogType (CatalogTypeTests.cs)</h4>
+                <ul>
+                    <li><strong>Criação válida:</strong> instanciação com Id e Name consistentes.</li>
+                    <li><strong>Rejeição de nome vazio:</strong> proteção contra strings vazias ou nulas.</li>
+                    <li><strong>Atualização do nome:</strong> validação completa ao executar <code>UpdateName(...)</code>.</li>
+                </ul>
+
+                <div class="methodology-box">
+                    <h3>💡 Regra de Ouro sobre Testes de Domínio</h3>
+                    <blockquote style="margin:0 0 0.5rem 0; font-size:1.05rem; font-weight:600; color:var(--primary);">
+                        "Testes devem proteger comportamentos relevantes do domínio. Não existe necessidade de criar um teste para cada linha de código."
+                    </blockquote>
+                    <p style="margin:0; font-size:0.95rem;">
+                        Testar getters triviais sem lógica não agrega valor de engenharia. O valor real do teste unitário está em blindar as regras de negócio, as invariantes e os fluxos de erro.
+                    </p>
+                </div>
+
+                <div class="methodology-box">
+                    <h3>🎓 Princípio de Aprendizado Reutilizável</h3>
+                    <p>Não memorizamos testes específicos de <code>Product</code>. O mecanismo reutilizável é:</p>
+
+                    <div class="mental-flow-strip" style="background:#ffffff; justify-content:center;">
+                        <span class="flow-step">Regra de Negócio</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">Comportamento Esperado</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">Cenário</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">Teste</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">Execução</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">Assert</span>
+                    </div>
+
+                    <p style="margin-top:0.75rem; margin-bottom:0; font-size:0.9rem; color:var(--text-light);">
+                        Esse processo poderá ser aplicado posteriormente a qualquer domínio, como <code>Medicine</code>, <code>Patient</code>, <code>Order</code>, <code>Invoice</code>, <code>Account</code> etc.
+                    </p>
+                </div>
+
+                <div class="learning-box" style="border-left-color: #3b82f6; background: #eff6ff; margin-top:1.5rem;">
+                    <h4 style="color: var(--primary);">🏛️ Fechamento do Capítulo 2: A Fundação do Domínio Concluída</h4>
+                    <p style="margin:0 0 0.75rem 0; font-size: 0.95rem; line-height: 1.6;">
+                        O domínio do microsserviço Catalog agora possui uma base sólida e completa:
+                    </p>
+                    <ul style="margin:0 0 0.75rem 1.25rem; font-size:0.9rem; line-height:1.6;">
+                        <li><strong>Entidades Ricas:</strong> <code>Product</code>, <code>Brand</code> e <code>CatalogType</code> em C# puro (.NET 10).</li>
+                        <li><strong>Regras de Negócio:</strong> Invariantes protegidas em construtores e métodos com <code>private set</code>.</li>
+                        <li><strong>Decisões sobre Tipos:</strong> Primitivos conscientes sem Value Objects artificiais ou prematuros.</li>
+                        <li><strong>Relacionamentos:</strong> Modelados explicitamente por identificadores sem acoplamento a ORMs.</li>
+                        <li><strong>Abstrações:</strong> Sem abstrações dogmáticas ou burocráticas no domínio.</li>
+                        <li><strong>Testes Automatizados:</strong> Suíte de testes unitários protegendo 100% dos comportamentos de negócio.</li>
+                    </ul>
+                    <p style="margin:0; font-size: 0.9rem; font-weight:600; color: var(--primary);">
+                        O objetivo não é memorizar Product, Brand ou CatalogType, mas aprender o processo de transformar requisitos em entidades, regras e testes.
+                    </p>
+                </div>
+
+                <div class="methodology-box" style="margin-top:1.5rem;">
+                    <h3>🧱 Progresso da Construção — Domínio Concluído</h3>
+                    <p style="margin-bottom:0.5rem; font-size:0.9rem; color:var(--text-light);"><strong>CAPÍTULO 2 → DOMÍNIO</strong></p>
+                    <div class="diagram-container" style="background:#ffffff; margin:0.5rem 0; padding:1rem;">
+                        <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.6; color:var(--text-heading);">
+2.1 Criando o projeto Domain       ✅
+2.2 Identificando as entidades     ✅
+2.3 Construindo as Entidades       ✅
+2.3.1 Estrutura base           ✅
+2.3.2 Product                  ✅
+2.3.3 Brand                    ✅
+2.3.4 CatalogType              ✅
+2.3.5 Identidade               ✅
+2.3.6 Encapsulamento           ✅
+2.3.7 Construtores             ✅
+2.3.8 Estado                   ✅
+2.4 Regras de negócio              ✅
+2.5 Value Objects                  ✅
+2.6 Relacionamentos                ✅
+2.7 Abstrações necessárias         ✅
+2.8 Testando o domínio             ✅
+                        </pre>
+                    </div>
+                    <div class="mental-flow-strip" style="margin-top:1rem;">
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">Capítulo 2: Domínio Concluído ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">Capítulo 3: 3.1 Criando o projeto Application ⬅️ PRÓXIMO</span>
+                    </div>
+                </div>
+
+                <h3>GANCHO PARA O PRÓXIMO PASSO</h3>
+                <p>Com a camada de Domínio concluída e totalmente testada, avançamos para o <strong>Capítulo 3: Aplicação</strong>, iniciando pela criação do projeto <strong>3.1 Criando o projeto Application</strong>.</p>
+                <p>Vamos orquestrar casos de uso, comandos, queries e DTOs que consumirão as entidades do domínio. 🧱</p>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-02-sec-07" onclick="navigateTo('cap-02-sec-07')">← Anterior: 2.7 Abstrações necessárias</a>
+                    <a href="#cap-03-sec-01" onclick="navigateTo('cap-03-sec-01')">Próximo: 3.1 Criando o projeto Application →</a>
+                </div>
+            </article>
+
             <!-- ==========================================
-                 CAPÍTULO 3: APLICAÇÃO (SEÇÃO CONCLUÍDA)
+                 CAPÍTULO 3: APLICAÇÃO (PRÓXIMA FASE)
                  ========================================== -->
             <article class="page-section" id="cap-03-sec-01">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
@@ -2672,16 +2868,16 @@ implementa detalhes técnicos (ex: ProductRepository com EF Core)
                         <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 3 • APLICAÇÃO</span>
                         <h2 style="margin:0.25rem 0 0 0;">3.1 Criando o projeto Application</h2>
                     </div>
-                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                    <span class="status-badge proximo"><span class="status-dot proximo"></span> ○ Próximo</span>
                 </div>
 
                 <div class="learning-box">
-                    <h4>Etapa Concluída na Solução</h4>
-                    <p style="margin:0; font-size: 0.95rem;">Criação da camada de orquestração de casos de uso do microsserviço Catalog.</p>
+                    <h4>Próxima Etapa da Construção</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Criação da camada de orquestração de casos de uso do microsserviço Catalog, intermediando a API e o Domínio através de DTOs, handlers e validações.</p>
                 </div>
 
-                <h3>O QUE FIZEMOS?</h3>
-                <p>Criamos o projeto <code>Catalog.Application.csproj</code>. Ele possui apenas uma dependência interna: uma referência de projeto direta para <code>Catalog.Domain</code>.</p>
+                <h3>O QUE SERÁ CONSTRUÍDO?</h3>
+                <p>Criaremos o projeto <code>Catalog.Application.csproj</code>. Ele possuirá apenas uma dependência interna: uma referência de projeto direta para <code>Catalog.Domain</code>.</p>
 
                 <div class="code-container">
                     <div class="code-header">
@@ -2931,7 +3127,7 @@ app.Run();</code></pre>
                         { id: "cap-02-sec-05", num: "2.5", title: "2.5 Value Objects", status: "concluido" },
                         { id: "cap-02-sec-06", num: "2.6", title: "2.6 Relacionamentos", status: "concluido" },
                         { id: "cap-02-sec-07", num: "2.7", title: "2.7 Abstrações necessárias", status: "concluido" },
-                        { id: "cap-02-sec-08", num: "2.8", title: "2.8 Testando o domínio", status: "proximo" }
+                        { id: "cap-02-sec-08", num: "2.8", title: "2.8 Testando o domínio", status: "concluido" }
                     ]
                 },
                 {
@@ -2940,7 +3136,7 @@ app.Run();</code></pre>
                     phase: "Estrutura",
                     desc: "Casos de uso, DTOs de entrada e saída, handlers e validação de comandos.",
                     items: [
-                        { id: "cap-03-sec-01", num: "3.1", title: "3.1 Criando o projeto Application", status: "concluido" },
+                        { id: "cap-03-sec-01", num: "3.1", title: "3.1 Criando o projeto Application", status: "proximo" },
                         { id: "cap-03-sec-02", num: "3.2", title: "3.2 Casos de uso", status: "planejado" },
                         { id: "cap-03-sec-03", num: "3.3", title: "3.3 Request", status: "planejado" },
                         { id: "cap-03-sec-04", num: "3.4", title: "3.4 Response", status: "planejado" },

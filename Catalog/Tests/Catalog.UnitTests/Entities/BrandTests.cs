@@ -1,25 +1,36 @@
-
 using Catalog.Domain.Entities;
 
-namespace Catalog.UnitTests.Entities
+namespace Catalog.UnitTests.Entities;
+
+public class BrandTests
 {
-    public class BrandTests
+    [Fact]
+    public void Constructor_WithValidData_AssignsIdentityAndName()
     {
-        [Fact]
-        public void Should_Create_Brand_With_Valid_Data()
-        {
-            var brand = new Brand(1, "Test Brand");
+        var brand = new Brand(1, "Test Brand");
 
-            Assert.NotNull(brand);
-            Assert.Equal(1, brand.Id);
-            Assert.Equal("Test Brand", brand.Name);
-        }
+        Assert.Equal(1, brand.Id);
+        Assert.Equal("Test Brand", brand.Name);
+    }
 
-        [Fact]
-        public void Should_Reject_Non_Positive_Brand_Id()
-        {
-            Assert.Throws<ArgumentException>(() => new Brand(0, "Test Brand"));
-            Assert.Throws<ArgumentException>(() => new Brand(-1, "Test Brand"));
-        }
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void Constructor_WithNonPositiveId_ThrowsArgumentException(int id)
+    {
+        var exception = Assert.Throws<ArgumentException>(() => new Brand(id, "Test Brand"));
+
+        Assert.Equal("id", exception.ParamName);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Constructor_WithInvalidName_ThrowsArgumentException(string? name)
+    {
+        var exception = Assert.Throws<ArgumentException>(() => new Brand(1, name!));
+
+        Assert.Equal("name", exception.ParamName);
     }
 }
