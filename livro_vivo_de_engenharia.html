@@ -1534,6 +1534,677 @@
                 </div>
             </article>
 
+            <article class="page-section" id="cap-02-sec-02">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 2 • DOMÍNIO</span>
+                        <h2 style="margin:0.25rem 0 0 0;">2.2 Identificando as entidades</h2>
+                    </div>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Mapeamento dos conceitos centrais do Bounded Context do Catalog que possuem identidade própria, ciclo de vida e estado contínuo.</p>
+                </div>
+
+                <h3>O QUE SÃO ENTIDADES NO DOMÍNIO?</h3>
+                <p>No Domain-Driven Design (DDD), uma <strong>Entidade</strong> é um objeto que possui uma <strong>identidade única e contínua</strong> ao longo do tempo. Dois objetos com os mesmos valores de atributos continuam sendo instâncias diferentes se seus identificadores forem distintos. Por outro lado, mesmo que o preço, a descrição ou a imagem de um produto sejam alterados, ele continua sendo o <em>mesmo produto</em> perante o negócio.</p>
+
+                <h3>ENTIDADES IDENTIFICADAS NO MICROSSERVIÇO CATALOG</h3>
+                <ul>
+                    <li><strong>Product (Item do Catálogo):</strong> A entidade central do nosso bounded context. Representa a unidade vendável exibida na vitrine com nome, preço, descrição, foto e associações de tipo e marca.</li>
+                    <li><strong>CatalogBrand (Marca / Fabricante):</strong> Entidade que agrupa itens por fabricante ou marca parceira.</li>
+                    <li><strong>CatalogType (Tipo / Categoria):</strong> Entidade que classifica itens por categoria de produto (ex: canecas, camisetas, pins).</li>
+                </ul>
+
+                <div class="arch-card">
+                    <h4>Decisão Arquitetural</h4>
+                    <div class="arch-title">Identidade Única e Foco no Comportamento</div>
+                    <div class="arch-item"><span class="arch-label">Modelagem Pura:</span> Antes de pensar em tabelas do PostgreSQL ou Entity Framework, modelamos as entidades como classes puras em C# que protegem suas próprias regras.</div>
+                    <div class="arch-item"><span class="arch-label">Identificador:</span> Definimos o identificador de <code>Product</code> de forma explícita, garantindo unicidade no ecossistema distribuído.</div>
+                </div>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-02-sec-01" onclick="navigateTo('cap-02-sec-01')">← Anterior: 2.1 Criando o projeto Domain</a>
+                    <a href="#cap-02-sec-03" onclick="navigateTo('cap-02-sec-03')">Próximo: 2.3 Construindo as Entidades →</a>
+                </div>
+            </article>
+
+            <article class="page-section" id="cap-02-sec-03">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 2 • DOMÍNIO</span>
+                        <h2 style="margin:0.25rem 0 0 0;">2.3 Construindo as Entidades</h2>
+                    </div>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Modelagem e construção física do conjunto inicial de entidades do domínio Catalog (<code>Product</code>, <code>Brand</code>, <code>CatalogType</code>), estabelecendo identidade, estado, construtores e proteção de encapsulamento.</p>
+                </div>
+
+                <h3>O QUE FOI CONSTRUÍDO</h3>
+                <p>No projeto <code>Catalog.Domain</code>, criamos a pasta <code>Entities</code> para abrigar o conjunto inicial de entidades identificado para o domínio Catalog:</p>
+                <ul>
+                    <li><code>Product</code></li>
+                    <li><code>Brand</code></li>
+                    <li><code>CatalogType</code></li>
+                </ul>
+
+                <div class="diagram-container" style="background:#f8fafc;">
+                    <pre style="margin:0; font-family:'Fira Code', monospace; color:var(--text-heading); font-size:0.9rem; line-height:1.4;">
+Catalog.Domain
+└── Entities
+    ├── Product.cs
+    ├── Brand.cs
+    └── CatalogType.cs
+                    </pre>
+                </div>
+
+                <h3>CONCEITO APRENDIDO: O QUE É UMA ENTITY?</h3>
+                <p>Uma <strong>Entity (Entidade)</strong> não é simplesmente uma classe com propriedades soltas. No Domain-Driven Design (DDD), uma entidade é definida por quatro pilares essenciais:</p>
+                <ul>
+                    <li><strong>Identidade:</strong> Possui um identificador único (`Id`) que a distingue de qualquer outro objeto ao longo de todo o seu ciclo de vida.</li>
+                    <li><strong>Estado:</strong> O conjunto de dados que a entidade carrega em um determinado instante.</li>
+                    <li><strong>Comportamento:</strong> Métodos e operações que expressam as regras e transformações de negócio.</li>
+                    <li><strong>Encapsulamento:</strong> O próprio objeto é o guardião do seu estado interno, impedindo alterações diretas e descontroladas vindas de fora.</li>
+                </ul>
+
+                <div class="methodology-box">
+                    <h3>💡 O Papel da Identidade no Domínio</h3>
+                    <p>O <code>Id</code> representa a identidade da entidade. Observe o exemplo:</p>
+                    <div class="diagram-container" style="background:#ffffff; margin:0.5rem 0;">
+                        <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.4;">
+Brand                     Brand
+Id = 1                    Id = 2
+Name = Nike               Name = Nike
+                        </pre>
+                    </div>
+                    <p style="margin-bottom:0;">Esses dois registros representam <strong>entidades diferentes</strong> no domínio, mesmo possuindo exatamente o mesmo nome, porque suas <strong>identidades são distintas</strong>.</p>
+                </div>
+
+                <h3>ENTIDADES CONSTRUÍDAS NO DOMÍNIO</h3>
+
+                <h4>2.3.1 Estrutura base da entidade</h4>
+                <p>Todas as entidades são construídas em C# puro (.NET 10), sem herança forçada de bibliotecas externas, sem Entity Framework e sem acoplamento técnico.</p>
+
+                <h4>2.3.2 Product (Item do Catálogo)</h4>
+                <p>Representa o produto do catálogo e possui:</p>
+                <div class="diagram-container" style="background:#ffffff;">
+                    <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.4;">
+Product
+├── Id (Identidade única)
+├── Name
+├── Description
+├── Price
+├── PictureFileName
+├── CatalogTypeId   (Referência à entidade CatalogType)
+└── CatalogBrandId  (Referência à entidade Brand)
+                    </pre>
+                </div>
+                <p>Os campos <code>CatalogTypeId</code> e <code>CatalogBrandId</code> representam referências às entidades relacionadas no catálogo.</p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.Domain/Entities/Product.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>namespace Catalog.Domain.Entities
+{
+    public class Product
+    {
+        public Guid Id { get; private set; }
+        public string Name { get; private set; } = string.Empty;
+        public string Description { get; private set; } = string.Empty;
+        public decimal Price { get; private set; }
+        public string PictureFileName { get; private set; } = string.Empty;
+        public int CatalogTypeId { get; private set; }
+        public int CatalogBrandId { get; private set; }
+
+        public Product(Guid id, string name, string description, decimal price, 
+            string pictureFileName, int catalogTypeId, int catalogBrandId)
+        {
+            Id = id;
+            Name = name;
+            Description = description;
+            Price = price;
+            PictureFileName = pictureFileName;
+            CatalogTypeId = catalogTypeId;
+            CatalogBrandId = catalogBrandId;
+        }
+    }
+}</code></pre>
+                </div>
+
+                <h4>2.3.3 Brand (Marca)</h4>
+                <p>Representa a marca comercial ou fabricante do produto:</p>
+                <div class="diagram-container" style="background:#ffffff;">
+                    <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.4;">
+Brand
+├── Id
+└── Name
+                    </pre>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.Domain/Entities/Brand.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>namespace Catalog.Domain.Entities
+{
+    public class Brand
+    {
+        public int Id { get; private set; }
+        public string Name { get; private set; } = string.Empty;
+
+        public Brand(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+    }
+}</code></pre>
+                </div>
+
+                <h4>2.3.4 CatalogType (Tipo / Categoria)</h4>
+                <p>Representa o tipo ou categoria do produto no catálogo:</p>
+                <div class="diagram-container" style="background:#ffffff;">
+                    <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.4;">
+CatalogType
+├── Id
+└── Name
+                    </pre>
+                </div>
+
+                <div class="arch-card">
+                    <h4>Decisão Técnica de Nomenclatura</h4>
+                    <div class="arch-title">Por que CatalogType em vez de Type?</div>
+                    <div class="arch-item"><span class="arch-label">Motivo:</span> <code>Type</code> é uma palavra excessivamente genérica e causaria ambiguidade e conflito direto com o tipo nativo <code>System.Type</code> da plataforma .NET (C#).</div>
+                    <div class="arch-item"><span class="arch-label">Clareza:</span> <code>CatalogType</code> expressa com precisão a categoria dentro do Bounded Context do catálogo.</div>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.Domain/Entities/CatalogType.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>namespace Catalog.Domain.Entities
+{
+    public class CatalogType
+    {
+        public int Id { get; private set; }
+        public string Name { get; private set; } = string.Empty;
+
+        public CatalogType(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+    }
+}</code></pre>
+                </div>
+
+                <h3>2.3.5 IDENTIDADE DAS ENTIDADES</h3>
+                <p>Cada entidade define sua estratégia de identidade. <code>Product</code> adota <code>Guid</code> como identificador global único, permitindo geração descentralizada, enquanto <code>Brand</code> e <code>CatalogType</code> utilizam identificadores numéricos sequenciais (<code>int</code>) por se tratarem de tabelas de domínio controladas.</p>
+
+                <h3>2.3.6 ENCAPSULAMENTO</h3>
+                <p>Comparamos duas abordagens de modelagem:</p>
+
+                <div class="diagram-container" style="background:#ffffff;">
+                    <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.5;">
+// ❌ MODELO ANÊMICO (Qualquer parte externa pode corromper os dados):
+public string Name { get; set; }
+
+// ✅ ENTIDADE RICA E ENCAPSULADA (Estado protegido):
+public string Name { get; private set; }
+                    </pre>
+                </div>
+
+                <p>O modificador <code>private set</code> impede que partes externas alterem diretamente as propriedades. A alteração deverá posteriormente passar por métodos de comportamento da própria entidade, como <code>UpdateName(...)</code> ou <code>UpdateDetails(...)</code>.</p>
+
+                <h3>2.3.7 CONSTRUTORES</h3>
+                <p>As entidades possuem construtores explícitos responsáveis pela criação inicial do objeto, garantindo que nenhuma entidade nasça sem seus dados essenciais.</p>
+                <p><em>Nota do método: As regras detalhadas e profundas de validação de invariantes serão tratadas na etapa <strong>2.4 Regras de negócio</strong>. Não antecipamos regras que ainda não foram estudadas e testadas.</em></p>
+
+                <h3>2.3.8 ESTADO DA ENTIDADE</h3>
+                <p>O estado é o conjunto de valores das propriedades em um determinado momento. Ao proteger o estado com <code>private set</code> e construtores consistentes, garantimos que a entidade mantém sua integridade durante toda a execução do microsserviço.</p>
+
+                <h3>RELACIONAMENTOS IDENTIFICADOS</h3>
+                <p>No domínio do Catalog, identificamos os seguintes relacionamentos conceituais:</p>
+
+                <div class="diagram-container" style="text-align:center;">
+                    <pre style="margin:0; font-family:'Fira Code', monospace; color:var(--text-heading); font-size:0.95rem; line-height:1.5;">
+Brand 1 ─────── N Product
+
+CatalogType 1 ─ N Product
+                    </pre>
+                </div>
+
+                <p>O <code>Product</code> já possui os campos <code>CatalogBrandId</code> e <code>CatalogTypeId</code> que materializam essas associações.</p>
+
+                <div class="arch-card" style="border-left-color: #f59e0b;">
+                    <h4>⚠️ Princípio Arquitetural: Não Antecipar Infraestrutura</h4>
+                    <div class="arch-title">Identificar Relações ≠ Configurar ORM</div>
+                    <div class="arch-item"><span class="arch-label">Atenção:</span> Identificamos o relacionamento conceitual no domínio, mas <strong>NÃO devemos introduzir ainda EF Core, propriedades de navegação de entidades (ex: <code>public Brand Brand { get; set; }</code>), Repository ou banco de dados</strong>.</div>
+                    <div class="arch-item"><span class="arch-label">Momento Certo:</span> Esses assuntos pertencem às camadas de Infraestrutura e Persistência e serão tratados quando forem estritamente necessários.</div>
+                </div>
+
+                <h3>PRINCÍPIO ARQUITETURAL APRENDIDO</h3>
+                <p>O processo de construção de um domínio <strong>não deve criar uma entidade isoladamente</strong> quando o próprio modelo já permite identificar um conjunto de entidades relacionadas.</p>
+                <p>Por isso refinamos nosso fluxo de <strong>"2.3 Criando uma Entity"</strong> para <strong>"2.3 Construindo as Entidades"</strong>. O objetivo é construir o conjunto inicial necessário para representar o contexto antes de aprofundar suas regras de validação.</p>
+
+                <div class="methodology-box">
+                    <h3>🎓 O que Aprendemos? (O Processo Reutilizável)</h3>
+                    <blockquote style="margin:0 0 1rem 0; font-size:1rem; font-weight:600; color:var(--primary);">
+                        "Não estamos aprendendo a construir um Product específico. Estamos aprendendo um processo reutilizável para modelar entidades de qualquer domínio."
+                    </blockquote>
+                    <table class="domain-comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Domínio de Negócio</th>
+                                <th>Conjunto Inicial de Entidades</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>E-Commerce (Catalog)</strong></td>
+                                <td><code>Product</code>, <code>Brand</code>, <code>CatalogType</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Farmácia</strong></td>
+                                <td><code>Medicine</code>, <code>Manufacturer</code>, <code>Category</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Hospital</strong></td>
+                                <td><code>Patient</code>, <code>Doctor</code>, <code>Department</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p style="margin-top:0.75rem; margin-bottom:0; font-size:0.9rem; color:var(--text-light);">Os nomes mudam, mas o processo de engenharia permanece exatamente o mesmo.</p>
+                </div>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-02-sec-02" onclick="navigateTo('cap-02-sec-02')">← Anterior: 2.2 Identificando as entidades</a>
+                    <a href="#cap-02-sec-04" onclick="navigateTo('cap-02-sec-04')">Próximo: 2.4 Regras de negócio →</a>
+                </div>
+            </article>
+
+            <article class="page-section" id="cap-02-sec-04">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 2 • DOMÍNIO</span>
+                        <h2 style="margin:0.25rem 0 0 0;">2.4 Regras de negócio</h2>
+                    </div>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Implementação de regras de negócio, invariantes de integridade e métodos protegidos de alteração nas entidades <code>Brand</code>, <code>CatalogType</code> e <code>Product</code>, consolidando o princípio de auto-proteção do estado.</p>
+                </div>
+
+                <h3>O QUE FOI CONSTRUÍDO</h3>
+                <p>No domínio do microsserviço Catalog, temos as entidades fundamentais:</p>
+                <ul>
+                    <li><code>Product</code></li>
+                    <li><code>Brand</code></li>
+                    <li><code>CatalogType</code></li>
+                </ul>
+
+                <p>Para garantir que nenhuma entidade exista em estado corrompido ou inválido, adotamos o padrão de auto-proteção contínua:</p>
+
+                <div class="visual-flow">
+                    <div style="background:#eff6ff; border:1px solid var(--primary); padding:0.35rem 1.2rem; border-radius:4px; font-weight:600;">Criação (Construtor)</div>
+                    <div class="arrow">↓</div>
+                    <div style="background:#ecfdf5; border:1px solid #10b981; padding:0.35rem 1.2rem; border-radius:4px; font-weight:600; color:#065f46;">Validação de Invariantes</div>
+                    <div class="arrow">↓</div>
+                    <div style="background:#eff6ff; border:1px solid var(--primary); padding:0.35rem 1.2rem; border-radius:4px; font-weight:600;">Estado Válido Garantido</div>
+                    <div style="margin: 0.5rem 0; font-size: 0.8rem; color: var(--text-light);">e posteriormente:</div>
+                    <div style="background:#eff6ff; border:1px solid var(--primary); padding:0.35rem 1.2rem; border-radius:4px; font-weight:600;">Alteração (Métodos de Domínio)</div>
+                    <div class="arrow">↓</div>
+                    <div style="background:#ecfdf5; border:1px solid #10b981; padding:0.35rem 1.2rem; border-radius:4px; font-weight:600; color:#065f46;">Validação de Invariantes</div>
+                    <div class="arrow">↓</div>
+                    <div style="background:#eff6ff; border:1px solid var(--primary); padding:0.35rem 1.2rem; border-radius:4px; font-weight:600;">Estado Válido Mantido</div>
+                </div>
+
+                <h3>2.4.1 REGRAS DA ENTIDADE BRAND</h3>
+                <p>A entidade <code>Brand</code> implementa validação tanto na criação quanto em sua alteração protegida:</p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.Domain/Entities/Brand.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>namespace Catalog.Domain.Entities
+{
+    public class Brand
+    {
+        public int Id { get; private set; }
+        public string Name { get; private set; } = string.Empty;
+
+        public Brand(string name)
+        {
+            ValidateName(name);
+            Name = name;
+        }
+
+        public void UpdateName(string name)
+        {
+            ValidateName(name);
+            Name = name;
+        }
+
+        private static void ValidateName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Brand name cannot be empty.");
+            }
+        }
+    }
+}</code></pre>
+                </div>
+                <p>A validação garante que o nome da marca não seja nulo, vazio ou composto exclusivamente por espaços em branco, centralizada no método <code>private static void ValidateName(string name)</code>.</p>
+
+                <h3>2.4.2 REGRAS DA ENTIDADE CATALOGTYPE</h3>
+                <p>Aplicamos o mesmo mecanismo coeso na entidade <code>CatalogType</code>:</p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.Domain/Entities/CatalogType.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>namespace Catalog.Domain.Entities
+{
+    public class CatalogType
+    {
+        public int Id { get; private set; }
+        public string Name { get; private set; } = string.Empty;
+
+        public CatalogType(string name)
+        {
+            ValidateName(name);
+            Name = name;
+        }
+
+        public void UpdateName(string name)
+        {
+            ValidateName(name);
+            Name = name;
+        }
+
+        private static void ValidateName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Catalog type name cannot be empty.");
+            }
+        }
+    }
+}</code></pre>
+                </div>
+
+                <h3>2.4.3 ESTRATÉGIA NO PRODUCT</h3>
+                <p>A entidade <code>Product</code> já possuía validações e comportamentos de criação e alteração para seus principais campos:</p>
+                <ul>
+                    <li><code>Name</code></li>
+                    <li><code>Description</code></li>
+                    <li><code>Price</code></li>
+                    <li><code>PictureFileName</code></li>
+                    <li><code>CatalogTypeId</code></li>
+                    <li><code>CatalogBrandId</code></li>
+                </ul>
+                <p>A estratégia adotada em <code>Product</code> segue a mesma diretriz arquitetural: centralizar regras em métodos <code>Validate...</code> reutilizados tanto no construtor de criação quanto nos métodos de alteração protegida (como <code>UpdateDetails(...)</code>), garantindo que preços nunca sejam negativos e que os IDs de relacionamento sejam sempre válidos (&gt; 0).</p>
+
+                <div class="methodology-box">
+                    <h3>🛡️ O Conceito Principal: A Auto-Proteção do Estado</h3>
+                    <blockquote style="margin:0 0 0.5rem 0; font-size:1.05rem; font-weight:600; color:var(--primary);">
+                        "Uma entidade deve proteger seu próprio estado."
+                    </blockquote>
+                    <p>O modificador <code>private set</code> combinado com métodos explícitos de alteração permite que a entidade controle como seu estado pode ser modificado por chamadas externas:</p>
+                    <div class="mental-flow-strip" style="background:#ffffff; justify-content:center;">
+                        <span class="flow-step">Chamada Externa</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#eff6ff; color:var(--primary);">UpdateName(...)</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46;">ValidateName(...)</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">Estado Válido</span>
+                    </div>
+                </div>
+
+                <h3>⚠️ IMPORTANTE: DUAS VALIDAÇÕES TOTALMENTE DIFERENTES</h3>
+                <p>É fundamental que o engenheiro de software compreenda a fronteira entre regras locais e regras que dependem do ecossistema:</p>
+
+                <div class="arch-card" style="border-left-color: #3b82f6;">
+                    <h4>Fronteiras de Validação</h4>
+                    <div class="arch-title">Validação de Domínio vs. Validação de Persistência</div>
+                    <div class="arch-item"><span class="arch-label">1. Regra Local do Valor:</span> <code>CatalogBrandId &gt; 0</code>. É uma regra relacionada ao valor recebido (invariante local). A própria entidade <code>Product</code> valida isso imediatamente em memória.</div>
+                    <div class="arch-item"><span class="arch-label">2. Validação Externa / Existência:</span> <em>"A Brand realmente existe?"</em>. Isso exige consultar uma fonte externa/persistência de dados.</div>
+                    <div class="arch-item"><span class="arch-label">Regra de Ouro:</span> <strong>NÃO coloque acesso ao banco de dados dentro da entidade de domínio puro.</strong> Esse assunto será tratado posteriormente quando chegarmos às camadas de infraestrutura e aplicação.</div>
+                </div>
+
+                <div class="arch-card">
+                    <h4>Decisão Arquitetural (ADR)</h4>
+                    <div class="arch-title">Por que não criar um NameValidator compartilhado agora?</div>
+                    <div class="arch-item"><span class="arch-label">Decisão:</span> Encontramos validações semelhantes em <code>Product</code>, <code>Brand</code> e <code>CatalogType</code>, mas decidimos <strong>NÃO</strong> criar imediatamente um <code>NameValidator</code> compartilhado.</div>
+                    <div class="arch-item"><span class="arch-label">Motivos:</span>
+                        <ul style="margin:0.25rem 0 0 1.25rem; padding:0;">
+                            <li>As regras podem evoluir de forma diferente para cada entidade no futuro.</li>
+                            <li>Abstrair somente para eliminar poucas linhas duplicadas pode gerar acoplamento desnecessário.</li>
+                            <li>Evita a armadilha de criar abstrações prematuras.</li>
+                        </ul>
+                    </div>
+                    <div class="arch-item"><span class="arch-label">Lição:</span> <strong>"Nem toda duplicação precisa imediatamente virar uma abstração."</strong></div>
+                </div>
+
+                <div class="methodology-box">
+                    <h3>🎓 Aprendizado Reutilizável de Engenharia</h3>
+                    <p>O aprendizado principal não é decorar as regras específicas do Catalog, mas dominar o processo mental reutilizável:</p>
+                    <div class="mental-flow-strip">
+                        <span class="flow-step">Regra de Negócio</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">Identificar Entidade Responsável</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">Proteger o Estado</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">Validar na Criação</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">Validar na Alteração</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">Manter a Entidade Consistente</span>
+                    </div>
+                    <p style="margin-top:0.75rem; margin-bottom:0; font-size:0.9rem; color:var(--text-light);">Esse mecanismo pode ser reutilizado em outros domínios de negócio.</p>
+                </div>
+
+                <div class="methodology-box" style="margin-top:1.5rem;">
+                    <h3>🧱 Progresso da Construção — Domínio</h3>
+                    <div class="mental-flow-strip">
+                        <span class="flow-step">2.1 Criando o projeto Domain ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">2.2 Identificando as entidades ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">2.3 Construindo as Entidades ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">2.4 Regras de negócio ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">2.5 Value Objects ⬅️ PRÓXIMO</span>
+                    </div>
+                </div>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-02-sec-03" onclick="navigateTo('cap-02-sec-03')">← Anterior: 2.3 Construindo as Entidades</a>
+                    <a href="#cap-02-sec-05" onclick="navigateTo('cap-02-sec-05')">Próximo: 2.5 Value Objects →</a>
+                </div>
+            </article>
+
+            <article class="page-section" id="cap-02-sec-05">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 2 • DOMÍNIO</span>
+                        <h2 style="margin:0.25rem 0 0 0;">2.5 Value Objects</h2>
+                    </div>
+                    <span class="status-badge proximo"><span class="status-dot proximo"></span> ○ Próximo</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Decisão Arquitetural Mapeada</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Avaliação pragmática de Value Objects no domínio Catalog, análise campo a campo de Product e a decisão arquitetural consciente de evitar complexidade acidental.</p>
+                </div>
+
+                <h3>A PERGUNTA CERTA ANTES DE CRIAR QUALQUER COISA</h3>
+                <p>Antes de abrir novos arquivos ou criar classes só para seguir um checklist dogmático, fazemos a pergunta que todo bom engenheiro de software deve se acostumar a fazer:</p>
+                <blockquote style="border-left: 4px solid var(--primary); margin: 1rem 0; padding: 0.75rem 1rem; background: #f8fafc; font-size: 1.05rem; font-weight: 500; color: var(--text-heading); border-radius: 0 4px 4px 0;">
+                    "Existe algum dado dentro de Product que realmente se beneficia de virar um Value Object?"
+                </blockquote>
+
+                <h3>O QUE É VALUE OBJECT?</h3>
+                <p><strong>Value Object</strong> (ou <em>Objeto de Valor</em>) é um objeto que é definido exclusivamente pelo seu valor, e <strong>não</strong> por um identificador próprio (Id). Se dois objetos possuem exatamente os mesmos atributos, eles são considerados equivalentes.</p>
+
+                <p><strong>Exemplo simples:</strong></p>
+                <p><code>Preço = 99,90</code></p>
+                <p>O preço não precisa ter um <code>Id</code>.</p>
+
+                <p>Mas poderíamos ter um conceito mais rico:</p>
+                <div class="mental-flow-strip" style="background:#f1f5f9;">
+                    <span class="flow-step" style="background:#3b82f6; color:#fff;">Money</span>
+                    <span class="flow-arrow">├──</span>
+                    <span class="flow-step">Amount = 99,90</span>
+                    <span class="flow-arrow">└──</span>
+                    <span class="flow-step">Currency = BRL</span>
+                </div>
+                <p>Nesse caso, <code>Money</code> representaria um conceito explícito do domínio se tivéssemos conversão cambial, múltiplas moedas ou regras de arredondamento específicas.</p>
+
+                <h3>OLHANDO NOSSO PRODUCT</h3>
+                <p>Hoje temos em nossa entidade:</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Campos Atuais do Product</span>
+                    </div>
+                    <pre><code>public Guid Id { get; private set; }
+public string Name { get; private set; }
+public string Description { get; private set; }
+public decimal Price { get; private set; }
+public string PictureFileName { get; private set; }
+public int CatalogTypeId { get; private set; }
+public int CatalogBrandId { get; private set; }</code></pre>
+                </div>
+
+                <h3>ANÁLISE CAMPO A CAMPO</h3>
+                <p>Vamos separar e avaliar criticamente cada campo:</p>
+
+                <table class="domain-comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Campo</th>
+                            <th>Value Object agora?</th>
+                            <th>Motivo Técnico</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>Id</code></td>
+                            <td>❌</td>
+                            <td>Identidade única da entidade.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Name</code></td>
+                            <td>❌</td>
+                            <td>String simples neste domínio (não exige regras complexas de composição).</td>
+                        </tr>
+                        <tr>
+                            <td><code>Description</code></td>
+                            <td>❌</td>
+                            <td>String simples descritiva.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Price</code></td>
+                            <td>🤔</td>
+                            <td>Pode representar um conceito mais rico, mas hoje é apenas valor numérico decimal com validação de não-negativo.</td>
+                        </tr>
+                        <tr>
+                            <td><code>PictureFileName</code></td>
+                            <td>❌</td>
+                            <td>String simples apontando para o nome do arquivo. Não há necessidade ainda.</td>
+                        </tr>
+                        <tr>
+                            <td><code>CatalogTypeId</code></td>
+                            <td>❌</td>
+                            <td>Referência de relacionamento para outra entidade (Tipo).</td>
+                        </tr>
+                        <tr>
+                            <td><code>CatalogBrandId</code></td>
+                            <td>❌</td>
+                            <td>Referência de relacionamento para outra entidade (Marca).</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>ENTÃO TEMOS UMA DECISÃO IMPORTANTE</h3>
+                <p><strong>Não vamos criar <code>Money</code> simplesmente porque "DDD manda".</strong></p>
+                <p>Neste momento, não precisamos dele. Nosso <code>Price</code> ainda é apenas <code>decimal</code>, e isso é <strong>perfeitamente válido</strong>.</p>
+                <p><em>Value Object só entra quando ele representa um conceito que realmente merece comportamento e significado próprios.</em></p>
+                <p>Isso é justamente uma decisão arquitetural que precisamos aprender a defender perante a equipe e os stakeholders.</p>
+
+                <h3>E O QUE O ESHOP ORIGINAL FAZIA?</h3>
+                <p>No eShop clássico da Microsoft, o <code>Product</code> também tratava o preço essencialmente como um valor numérico:</p>
+                <div class="code-container">
+                    <pre><code>public decimal Price { get; set; }</code></pre>
+                </div>
+                <p>Não havia um <code>Money</code> sofisticado envolvendo o preço. Então aqui temos um ótimo exemplo de evolução racional:</p>
+                <ul>
+                    <li>DDD diz: <em>"Você pode usar Value Objects."</em></li>
+                    <li>Nós perguntamos: <em>"Precisamos?"</em></li>
+                    <li>Resposta: <strong>"Neste momento, não."</strong></li>
+                </ul>
+                <p>E seguimos. <strong>Isso é arquitetura prática. 👍</strong></p>
+
+                <h3>MAS ENTÃO O CAPÍTULO 2.5 TERMINA SEM CÓDIGO?</h3>
+                <p><strong>Sim. E isso é fundamental.</strong></p>
+                <p>Não precisamos fabricar código para preencher um capítulo. Saber <em>quando não adicionar complexidade acidental</em> é uma das maiores virtudes de um engenheiro de software.</p>
+
+                <div class="arch-card">
+                    <h4>Registro de Decisão Arquitetural (ADR)</h4>
+                    <div class="arch-title">2.5 Value Objects — Decisão no Domínio Catalog</div>
+                    <div class="arch-item"><span class="arch-label">Decisão:</span> Neste momento o domínio de Catalog não possui um conceito que justifique a criação de um Value Object. <code>Price</code> permanece como <code>decimal</code>.</div>
+                    <div class="arch-item"><span class="arch-label">Motivo:</span> Não existe necessidade de encapsular comportamento ou regras adicionais de moedas/câmbio nesse valor neste estágio.</div>
+                    <div class="arch-item"><span class="arch-label">Benefício:</span> Mantém a entidade enxuta e evita mapeamentos complexos desnecessários na persistência de dados.</div>
+                </div>
+
+                <div class="methodology-box">
+                    <h3>🧱 Progresso da Construção — Domínio</h3>
+                    <div class="mental-flow-strip">
+                        <span class="flow-step">2.1 Criando o projeto Domain ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">2.2 Identificando as entidades ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">2.3 Construindo as Entidades ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">2.4 Regras de negócio ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">2.5 Value Objects ⬅️ PRÓXIMO</span>
+                    </div>
+                </div>
+
+                <h3>GANCHO PARA O PRÓXIMO PASSO</h3>
+                <p>Agora sim, vamos para <strong>2.6 Relacionamentos</strong>.</p>
+                <p>E aqui começa uma parte interessante, porque o <code>Product</code> já possui:</p>
+                <div class="code-container">
+                    <pre><code>public int CatalogTypeId { get; private set; }
+public int CatalogBrandId { get; private set; }</code></pre>
+                </div>
+                <p>A pergunta será: <strong>Esses dois IDs são apenas números ou representam relacionamentos reais dentro do domínio?</strong></p>
+                <p>É aí que vamos construir o próximo pedaço. 🧱</p>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-02-sec-04" onclick="navigateTo('cap-02-sec-04')">← Anterior: 2.4 Regras de negócio</a>
+                    <a href="#cap-02-sec-06" onclick="navigateTo('cap-02-sec-06')">Próximo: 2.6 Relacionamentos →</a>
+                </div>
+            </article>
+
             <!-- ==========================================
                  CAPÍTULO 3: APLICAÇÃO (SEÇÃO CONCLUÍDA)
                  ========================================== -->
@@ -1796,10 +2467,10 @@ app.Run();</code></pre>
                     desc: "Entidades ricas, Value Objects, invariantes e regras puras sem acoplamento a frameworks.",
                     items: [
                         { id: "cap-02-sec-01", num: "2.1", title: "2.1 Criando o projeto Domain", status: "concluido" },
-                        { id: "cap-02-sec-02", num: "2.2", title: "2.2 Identificando as entidades", status: "proximo" },
-                        { id: "cap-02-sec-03", num: "2.3", title: "2.3 Criando uma Entity", status: "planejado" },
-                        { id: "cap-02-sec-04", num: "2.4", title: "2.4 Regras de negócio", status: "planejado" },
-                        { id: "cap-02-sec-05", num: "2.5", title: "2.5 Value Objects", status: "planejado" },
+                        { id: "cap-02-sec-02", num: "2.2", title: "2.2 Identificando as entidades", status: "concluido" },
+                        { id: "cap-02-sec-03", num: "2.3", title: "2.3 Construindo as Entidades", status: "concluido" },
+                        { id: "cap-02-sec-04", num: "2.4", title: "2.4 Regras de negócio", status: "concluido" },
+                        { id: "cap-02-sec-05", num: "2.5", title: "2.5 Value Objects", status: "proximo" },
                         { id: "cap-02-sec-06", num: "2.6", title: "2.6 Relacionamentos", status: "planejado" },
                         { id: "cap-02-sec-07", num: "2.7", title: "2.7 Abstrações necessárias", status: "planejado" },
                         { id: "cap-02-sec-08", num: "2.8", title: "2.8 Testando o domínio", status: "planejado" }
