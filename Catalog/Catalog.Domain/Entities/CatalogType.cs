@@ -6,48 +6,19 @@ namespace Catalog.Domain.Entities
         public int Id { get; private set; }
         public string Name { get; private set; } = string.Empty;
 
-        public CatalogType(string name)
+        public CatalogType(int id, string name)
         {
-            ValidateName(name);
-            Name = name;
-        }
+            if (id <= 0)
+            {
+                throw new ArgumentException("CatalogType ID must be greater than zero.", nameof(id));
+            }
 
-        public void UpdateName(string name)
-        {
-            ValidateName(name);
-            Name = name;
-        }
-
-        private static void ValidateName(string name)
-        {
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentException("Catalog type name cannot be empty.", nameof(name));
+                throw new ArgumentException("CatalogType name cannot be empty.", nameof(name));
             }
-        }
-    }
-}
-        public Guid Id { get; set; }
-        public string Name { get; private set; } = string.Empty;
 
-        protected CatalogType() { }
-
-        public CatalogType(string name)
-        {
-            Id = Guid.NewGuid();
-            SetName(name);
-        }
-
-        private void SetName(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentException("Catalog type name cannot be empty.");
-            }
-            if (name.Length > 100)
-            {
-                throw new ArgumentException("Catalog type name cannot exceed 100 characters.");
-            }
+            Id = id;
             Name = name;
         }
     }

@@ -9,7 +9,7 @@ namespace Catalog.Domain.Entities
         public string PictureFileName { get; private set; } = string.Empty;
         public int CatalogTypeId { get; private set; }
         public int CatalogBrandId { get; private set; }
-      
+
         public Product(
             Guid id,
             string name,
@@ -35,13 +35,10 @@ namespace Catalog.Domain.Entities
             CatalogBrandId = catalogBrandId;
         }
 
-        public void UpdateDetails(
-            string name,
-            string description,
-            decimal price,
-            string pictureFileName,
-            int catalogTypeId,
-            int catalogBrandId)
+        private void ValidateProduct(string name, decimal price, int catalogTypeId, int catalogBrandId)
+        {
+            throw new NotImplementedException();
+        }
         public Product(Guid id, string name, decimal price, string description,
          string pictureFileName, int catalogTypeId, int catalogBrandId)
 
@@ -72,8 +69,7 @@ namespace Catalog.Domain.Entities
             CatalogTypeId = catalogTypeId;
             CatalogBrandId = catalogBrandId;
         }
-      
-        #region Validation Methods
+
         private void ValidatePrice(decimal price)
         {
             if (price < 0)
@@ -81,7 +77,6 @@ namespace Catalog.Domain.Entities
                 throw new ArgumentException("Product price cannot be negative.");
             }
         }
-
         private void ValidateDescription(string description)
         {
             if (string.IsNullOrWhiteSpace(description))
@@ -89,7 +84,6 @@ namespace Catalog.Domain.Entities
                 throw new ArgumentException("Product description cannot be empty.");
             }
         }
-
         private void ValidateCatalogTypeId(int catalogTypeId)
         {
             if (catalogTypeId <= 0)
@@ -97,7 +91,6 @@ namespace Catalog.Domain.Entities
                 throw new ArgumentException("Catalog type ID must be greater than zero.");
             }
         }
-
         private void ValidateCatalogBrandId(int catalogBrandId)
         {
             if (catalogBrandId <= 0)
@@ -105,7 +98,6 @@ namespace Catalog.Domain.Entities
                 throw new ArgumentException("Catalog brand ID must be greater than zero.");
             }
         }
-
         private void ValidatePictureFileName(string pictureFileName)
         {
             if (string.IsNullOrWhiteSpace(pictureFileName))
@@ -120,7 +112,6 @@ namespace Catalog.Domain.Entities
                 throw new ArgumentException("Product name cannot be empty.");
             }
         }
-        // Exemplo: Validar que o nome do produto não esteja vazio
         public void ValidateProduct(string name, decimal price, string description,
          string pictureFileName, int catalogTypeId, int catalogBrandId)
         {
@@ -146,6 +137,5 @@ namespace Catalog.Domain.Entities
         }
     }
 }
-    #endregion validation Methods
-}
+
 
