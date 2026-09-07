@@ -33,6 +33,9 @@ public class UnitTest1
     [Fact]
     public void Should_Update_Product_Price()
     {
+        //  var product = new Product(Guid.NewGuid(), "Test Product", 10.99m, "Test Description", "nootbook.jpg", 1, 1);
+        //  product.ValidatePrice(15.99m);
 
+        //  Assert.Equal(15.99m, product.Price);
     }
 }
