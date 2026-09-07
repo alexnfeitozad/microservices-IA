@@ -9,18 +9,34 @@ public class ProductTests
     private static Product CreateValidProduct() =>
         new(ValidId, "Running Shoes", "Lightweight trainers", 199.90m, "shoes.png", 1, 2);
 
+    private static void AssertProduct(
+        Product product,
+        Guid id,
+        string name,
+        string description,
+        decimal price,
+        string pictureFileName,
+        int catalogTypeId,
+        int catalogBrandId)
+    {
+        Assert.Equal(id, product.Id);
+        Assert.Equal(name, product.Name);
+        Assert.Equal(description, product.Description);
+        Assert.Equal(price, product.Price);
+        Assert.Equal(pictureFileName, product.PictureFileName);
+        Assert.Equal(catalogTypeId, product.CatalogTypeId);
+        Assert.Equal(catalogBrandId, product.CatalogBrandId);
+    }
+
+    private static void AssertUnchangedValidProduct(Product product) =>
+        AssertProduct(product, ValidId, "Running Shoes", "Lightweight trainers", 199.90m, "shoes.png", 1, 2);
+
     [Fact]
     public void Constructor_WithValidData_AssignsIdentityAndState()
     {
         var product = CreateValidProduct();
 
-        Assert.Equal(ValidId, product.Id);
-        Assert.Equal("Running Shoes", product.Name);
-        Assert.Equal("Lightweight trainers", product.Description);
-        Assert.Equal(199.90m, product.Price);
-        Assert.Equal("shoes.png", product.PictureFileName);
-        Assert.Equal(1, product.CatalogTypeId);
-        Assert.Equal(2, product.CatalogBrandId);
+        AssertUnchangedValidProduct(product);
     }
 
     [Fact]
@@ -92,28 +108,71 @@ public class ProductTests
 
         product.UpdateDetails("Trail Shoes", "Waterproof", 249.50m, "trail.png", 3, 4);
 
-        Assert.Equal(ValidId, product.Id);
-        Assert.Equal("Trail Shoes", product.Name);
-        Assert.Equal("Waterproof", product.Description);
-        Assert.Equal(249.50m, product.Price);
-        Assert.Equal("trail.png", product.PictureFileName);
-        Assert.Equal(3, product.CatalogTypeId);
-        Assert.Equal(4, product.CatalogBrandId);
+        AssertProduct(product, ValidId, "Trail Shoes", "Waterproof", 249.50m, "trail.png", 3, 4);
     }
 
     [Fact]
-    public void UpdateDetails_WithInvalidName_KeepsPreviousState()
+    public void UpdateDetails_AllowsZeroPriceAndEmptyOptionalText()
     {
         var product = CreateValidProduct();
 
-        Assert.Throws<ArgumentException>(() =>
-            product.UpdateDetails(" ", "new desc", 10m, "new.png", 8, 9));
+        product.UpdateDetails("Free Sample", null!, 0m, null!, 1, 1);
 
-        Assert.Equal("Running Shoes", product.Name);
-        Assert.Equal("Lightweight trainers", product.Description);
-        Assert.Equal(199.90m, product.Price);
-        Assert.Equal("shoes.png", product.PictureFileName);
-        Assert.Equal(1, product.CatalogTypeId);
-        Assert.Equal(2, product.CatalogBrandId);
+        AssertProduct(product, ValidId, "Free Sample", string.Empty, 0m, string.Empty, 1, 1);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void UpdateDetails_WithInvalidName_KeepsPreviousState(string? name)
+    {
+        var product = CreateValidProduct();
+
+        var exception = Assert.Throws<ArgumentException>(() =>
+            product.UpdateDetails(name!, "new desc", 10m, "new.png", 8, 9));
+
+        Assert.Equal("name", exception.ParamName);
+        AssertUnchangedValidProduct(product);
+    }
+
+    [Fact]
+    public void UpdateDetails_WithNegativePrice_KeepsPreviousState()
+    {
+        var product = CreateValidProduct();
+
+        var exception = Assert.Throws<ArgumentException>(() =>
+            product.UpdateDetails("Trail Shoes", "new desc", -0.01m, "new.png", 8, 9));
+
+        Assert.Equal("price", exception.ParamName);
+        AssertUnchangedValidProduct(product);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void UpdateDetails_WithInvalidCatalogTypeId_KeepsPreviousState(int catalogTypeId)
+    {
+        var product = CreateValidProduct();
+
+        var exception = Assert.Throws<ArgumentException>(() =>
+            product.UpdateDetails("Trail Shoes", "new desc", 10m, "new.png", catalogTypeId, 9));
+
+        Assert.Equal("catalogTypeId", exception.ParamName);
+        AssertUnchangedValidProduct(product);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void UpdateDetails_WithInvalidCatalogBrandId_KeepsPreviousState(int catalogBrandId)
+    {
+        var product = CreateValidProduct();
+
+        var exception = Assert.Throws<ArgumentException>(() =>
+            product.UpdateDetails("Trail Shoes", "new desc", 10m, "new.png", 8, catalogBrandId));
+
+        Assert.Equal("catalogBrandId", exception.ParamName);
+        AssertUnchangedValidProduct(product);
     }
 }
