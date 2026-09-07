@@ -1,0 +1,2447 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construindo Microsserviços - Livro Vivo</title>
+    
+    <!-- Tipografia: Inter para texto, Fira Code para código -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- ==========================================
+         INÍCIO DO BLOCO CSS (Futuro css/book.css)
+         ========================================== -->
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --bg-alt: #f8fafc;
+            --text-main: #334155;
+            --text-light: #64748b;
+            --text-heading: #0f172a;
+            --sidebar-bg: #0f172a;
+            --sidebar-text: #e2e8f0;
+            --sidebar-hover: #1e293b;
+            --sidebar-active: #2563eb;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --border: #e2e8f0;
+            --code-bg: #1e293b;
+            --code-text: #f8fafc;
+            
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 4rem;
+            
+            --border-radius: 8px;
+            --transition: all 0.2s ease-in-out;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: var(--text-main);
+            background-color: var(--bg-color);
+            line-height: 1.7;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 16px;
+        }
+
+        h1, h2, h3, h4, h5 {
+            color: var(--text-heading);
+            line-height: 1.3;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+        }
+
+        p { margin-bottom: var(--spacing-md); }
+        
+        a { color: var(--primary); text-decoration: none; transition: var(--transition); }
+        a:hover { text-decoration: underline; color: var(--primary-hover); }
+
+        /* Layout Principal */
+        .sidebar {
+            width: 320px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-header h2 {
+            color: #ffffff;
+            font-size: 1.25rem;
+            margin-bottom: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-header span {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-md) 0;
+        }
+
+        .nav-section { margin-bottom: var(--spacing-md); }
+        .nav-section-title {
+            padding: 0 var(--spacing-lg);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 600;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.5rem var(--spacing-lg);
+            color: var(--sidebar-text);
+            font-size: 0.9rem;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link:focus {
+            background-color: var(--sidebar-hover);
+            text-decoration: none;
+            outline: none;
+        }
+
+        .nav-link.active {
+            background-color: var(--sidebar-hover);
+            border-left-color: var(--sidebar-active);
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--bg-color);
+        }
+
+        .topbar {
+            height: 60px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 var(--spacing-lg);
+            background-color: var(--bg-color);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-heading);
+            margin-right: var(--spacing-md);
+        }
+
+        .breadcrumbs {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        
+        .breadcrumbs span { color: var(--text-heading); font-weight: 500;}
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-xl) 10%;
+            scroll-behavior: smooth;
+        }
+
+        .page-section {
+            display: none;
+            max-width: 900px;
+            margin: 0 auto;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .page-section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Capa Especial */
+        .cover-page {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 70vh;
+        }
+        .cover-page h1 {
+            font-size: 3.5rem;
+            letter-spacing: -1.5px;
+            margin-bottom: var(--spacing-md);
+            background: linear-gradient(135deg, var(--sidebar-bg), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .cover-page .subtitle {
+            font-size: 1.5rem;
+            color: var(--text-light);
+            font-weight: 300;
+            margin-bottom: var(--spacing-lg);
+            max-width: 600px;
+        }
+        .cover-page .phrase {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--primary);
+            padding: var(--spacing-md) var(--spacing-lg);
+            background-color: var(--bg-alt);
+            border-radius: 50px;
+        }
+
+        /* Componentes Visuais Reutilizáveis */
+        
+        /* Fluxo Visual */
+        .visual-flow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            margin: var(--spacing-lg) 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .visual-flow .arrow { color: var(--text-light); font-size: 1.2rem; }
+
+        /* Diagrama Base (Mapa Visual) */
+        .diagram-container {
+            background-color: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+            overflow-x: auto;
+        }
+        
+        .tree-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Fira Code', monospace;
+            min-width: 600px;
+        }
+
+        .tree-node {
+            background: var(--sidebar-bg);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .tree-children {
+            display: flex;
+            gap: 2rem;
+            position: relative;
+        }
+        
+        .tree-children::before {
+            content: '';
+            position: absolute;
+            top: -2rem;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background-color: var(--text-light);
+        }
+
+        .tree-child {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .tree-child::before {
+            content: '';
+            position: absolute;
+            top: -2rem;
+            width: 2px;
+            height: 2rem;
+            background-color: var(--text-light);
+        }
+        
+        .tree-node-main::after {
+            content: '';
+            position: absolute;
+            bottom: -2rem;
+            left: 50%;
+            width: 2px;
+            height: 2rem;
+            background-color: var(--text-light);
+        }
+
+        .tree-child .service {
+            background-color: white;
+            border: 2px solid var(--primary);
+            color: var(--text-heading);
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tree-child .domain {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* 1. Receita de Engenharia */
+        .recipe-card {
+            background-color: #fffbeb;
+            border: 1px dashed #f59e0b;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+        }
+        .recipe-card h4 { color: #b45309; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;}
+        .recipe-row { margin-bottom: 0.75rem; }
+        .recipe-label { font-weight: 600; color: #92400e; margin-right: 0.5rem; }
+
+        /* 2. Decisão Arquitetural */
+        .arch-card {
+            background-color: #f8fafc;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .arch-card h4 { color: var(--sidebar-bg); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;}
+        .arch-card .arch-title { font-size: 1.25rem; font-weight: 600; color: var(--primary); margin-bottom: 1rem; }
+        .arch-item { margin-bottom: 0.75rem; }
+        .arch-label { font-weight: 600; color: var(--text-heading); }
+
+        /* 3. Código */
+        .code-container {
+            position: relative;
+            margin: var(--spacing-lg) 0;
+            border-radius: var(--border-radius);
+            background-color: var(--code-bg);
+            overflow: hidden;
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #0f172a;
+            padding: 0.5rem 1rem;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            font-family: 'Fira Code', monospace;
+        }
+        .btn-copy {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: var(--transition);
+        }
+        .btn-copy:hover { background: rgba(255,255,255,0.2); }
+        .code-container pre {
+            padding: 1.5rem;
+            margin: 0;
+            overflow-x: auto;
+            color: var(--code-text);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* 4. Caixa de Destaque (O que vamos aprender) */
+        .learning-box {
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md) var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            background: linear-gradient(to right, #f8fafc, #ffffff);
+        }
+        .learning-box h4 {
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Navegação de Rodapé */
+        .footer-nav {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid var(--border);
+            padding-top: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+        }
+        .footer-btn {
+            display: flex;
+            flex-direction: column;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+        .footer-btn span { font-size: 0.85rem; text-transform: uppercase; }
+        .footer-btn strong { color: var(--primary); font-size: 1.1rem; font-weight: 500; }
+        .footer-btn.next { text-align: right; }
+        .footer-btn:hover strong { text-decoration: underline; }
+
+        /* Em construção */
+        .construction-notice {
+            display: inline-block;
+            background-color: #f1f5f9;
+            color: #475569;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px dashed #cbd5e1;
+            margin: 1rem 0;
+        }
+
+        /* ==========================================
+           ESTILOS DO SUMÁRIO MESTRE & NAVEGAÇÃO
+           ========================================== */
+
+        /* Badges de Status */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            line-height: 1;
+            white-space: nowrap;
+            user-select: none;
+        }
+        .status-badge.concluido {
+            background-color: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        .status-badge.andamento {
+            background-color: #fffbeb;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        .status-badge.proximo {
+            background-color: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+        .status-badge.planejado {
+            background-color: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Indicador circular de status */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .status-dot.concluido { background-color: #10b981; }
+        .status-dot.andamento {
+            background-color: #f59e0b;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+            animation: pulseDot 2s infinite ease-in-out;
+        }
+        .status-dot.proximo { background-color: #3b82f6; }
+        .status-dot.planejado { background-color: #94a3b8; }
+
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        /* Accordion para Capítulos na Sidebar */
+        .sidebar-chapter-group {
+            margin-bottom: 2px;
+        }
+        .sidebar-chapter-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem var(--spacing-lg);
+            color: var(--sidebar-text);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: var(--transition);
+            user-select: none;
+        }
+        .sidebar-chapter-header:hover {
+            background-color: var(--sidebar-hover);
+            color: #ffffff;
+        }
+        .sidebar-chapter-header.active-chapter {
+            border-left-color: var(--sidebar-active);
+            color: #ffffff;
+            background-color: rgba(37, 99, 235, 0.15);
+        }
+        .sidebar-chapter-header .chevron {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            transition: transform 0.2s ease;
+            display: inline-block;
+        }
+        .sidebar-chapter-header.open .chevron {
+            transform: rotate(90deg);
+            color: #ffffff;
+        }
+        .sidebar-subnav {
+            display: none;
+            background-color: rgba(0, 0, 0, 0.22);
+            padding: 0.25rem 0;
+        }
+        .sidebar-subnav.show {
+            display: block;
+        }
+        .sidebar-subnav .nav-link {
+            padding: 0.35rem var(--spacing-lg) 0.35rem calc(var(--spacing-lg) + 0.6rem);
+            font-size: 0.8rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-subnav .nav-link:hover {
+            color: #ffffff;
+            background-color: var(--sidebar-hover);
+        }
+        .sidebar-subnav .nav-link.active {
+            color: #ffffff;
+            background-color: var(--sidebar-hover);
+            border-left-color: var(--sidebar-active);
+            font-weight: 600;
+        }
+
+        /* Hero do Sumário Mestre */
+        .master-summary-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #ffffff;
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-lg);
+            border: 1px solid #334155;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.12);
+        }
+        .master-summary-hero h2 {
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+            font-size: 1.75rem;
+            letter-spacing: -0.5px;
+        }
+        .master-summary-hero p {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+            max-width: 800px;
+        }
+        .progress-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 0.6rem 0.8rem;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #ffffff;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.25rem;
+        }
+        .master-progress-track {
+            height: 10px;
+            background-color: #334155;
+            border-radius: 5px;
+            overflow: hidden;
+            display: flex;
+            margin: 1rem 0 0.5rem 0;
+        }
+        .progress-segment {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .progress-segment.concluido { background-color: #10b981; }
+        .progress-segment.andamento { background-color: #f59e0b; }
+        .progress-segment.proximo { background-color: #3b82f6; }
+        .progress-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: #cbd5e1;
+            margin-top: 0.5rem;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        /* Metáfora da Casa de Software */
+        .metaphor-section {
+            margin: var(--spacing-xl) 0 var(--spacing-lg);
+        }
+        .house-steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .house-step-card {
+            background-color: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+        .house-step-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .house-step-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--primary);
+        }
+        .house-step-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-heading);
+            margin: 0;
+        }
+        .house-step-desc {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* Caixa de Metodologia e Domínio Reutilizável */
+        .methodology-box {
+            background: #f8fafc;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .methodology-box h3 {
+            margin-top: 0;
+            color: var(--text-heading);
+        }
+        .mental-flow-strip {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.4rem;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.78rem;
+            color: var(--primary);
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        .mental-flow-strip .flow-step {
+            font-weight: 600;
+            background: #eff6ff;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .mental-flow-strip .flow-arrow {
+            color: var(--text-light);
+        }
+
+        .domain-comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+        .domain-comparison-table th, .domain-comparison-table td {
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+        .domain-comparison-table th {
+            background-color: var(--bg-alt);
+            font-weight: 600;
+            color: var(--text-heading);
+        }
+
+        /* Roadmap dos 15 Capítulos */
+        .roadmap-chapters-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            margin-top: var(--spacing-lg);
+        }
+        .roadmap-chapter-card {
+            background-color: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+        .roadmap-chapter-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .roadmap-chapter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.9rem 1.25rem;
+            background-color: var(--bg-alt);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+        .roadmap-chapter-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-heading);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .roadmap-chapter-num {
+            font-family: 'Fira Code', monospace;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .roadmap-sections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 0.6rem;
+            padding: 1rem 1.25rem;
+        }
+        .roadmap-section-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.55rem 0.75rem;
+            border-radius: 6px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            text-decoration: none;
+            color: var(--text-main);
+            transition: var(--transition);
+        }
+        .roadmap-section-link:hover {
+            border-color: var(--primary);
+            background-color: #f8fafc;
+            text-decoration: none;
+            transform: translateX(2px);
+        }
+        .roadmap-section-link .sec-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Banner de Construção para Capítulos e Seções */
+        .construction-hero-banner {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            padding: 1.25rem;
+            border-radius: var(--border-radius);
+            border: 1px dashed var(--border);
+            background-color: var(--bg-alt);
+            margin: 1.5rem 0;
+        }
+        .construction-hero-banner.in-progress {
+            border-color: #f59e0b;
+            background-color: #fffbeb;
+        }
+        .construction-hero-banner.completed {
+            border-color: #10b981;
+            background-color: #ecfdf5;
+        }
+        .construction-hero-icon {
+            font-size: 1.75rem;
+            line-height: 1;
+        }
+        .construction-hero-text h4 {
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+        }
+        .construction-hero-text p {
+            margin: 0;
+            font-size: 0.88rem;
+            color: var(--text-light);
+        }
+
+        .section-nav-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1rem;
+            margin: 2rem 0 1rem 0;
+            font-size: 0.85rem;
+        }
+        .section-nav-flow a {
+            font-weight: 500;
+        }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .content-area { padding: var(--spacing-lg) 5%; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -320px;
+                top: 0;
+                bottom: 0;
+                box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            }
+            .sidebar.open { transform: translateX(320px); }
+            .mobile-toggle { display: block; }
+            .cover-page h1 { font-size: 2.5rem; }
+            
+            /* Overlay no mobile */
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 90;
+            }
+            .sidebar-overlay.open { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+    <!-- Menu Lateral -->
+    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Menu Principal">
+        <div class="sidebar-header">
+            <h2>CONSTRUINDO</h2>
+            <h2>MICROSSERVIÇOS</h2>
+            <span>Livro Vivo de Engenharia</span>
+        </div>
+        <div class="sidebar-nav" id="sidebarNav">
+            <!-- Menu gerado dinamicamente via JS -->
+        </div>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+        <!-- Topbar (Mobile Toggle & Breadcrumbs) -->
+        <header class="topbar">
+            <button class="mobile-toggle" id="mobileToggle" aria-label="Abrir menu" aria-expanded="false">
+                ☰
+            </button>
+            <div class="breadcrumbs" id="breadcrumbs" aria-live="polite">
+                Livro Vivo / <span>Capa</span>
+            </div>
+        </header>
+
+        <!-- Área de leitura -->
+        <div class="content-area" id="contentArea">
+            
+            <!-- CAPA -->
+            <article class="page-section active" id="capa">
+                <div class="cover-page">
+                    <h1>CONSTRUINDO MICROSSERVIÇOS</h1>
+                    <p class="subtitle">Construção prática, arquitetura, .NET e IA sem dependência de ferramentas</p>
+                    <div class="phrase">Aprenda construindo. Entenda o porquê. Domine o como.</div>
+                </div>
+            </article>
+
+            <!-- PÁGINA INICIAL (Visão Geral) -->
+            <article class="page-section" id="visao-geral">
+                <h2>O Livro Vivo</h2>
+                <p>Este livro acompanha a construção de um sistema real de microsserviços, transformando cada etapa do desenvolvimento em conhecimento reutilizável.</p>
+                <p>O fluxo de evolução constante segue o ciclo:</p>
+                
+                <div class="visual-flow" aria-label="Fluxo de desenvolvimento">
+                    <div>IDEIA</div>
+                    <div class="arrow">↓</div>
+                    <div>DOMÍNIO</div>
+                    <div class="arrow">↓</div>
+                    <div>ARQUITETURA</div>
+                    <div class="arrow">↓</div>
+                    <div>CONSTRUÇÃO</div>
+                    <div class="arrow">↓</div>
+                    <div>TESTES</div>
+                    <div class="arrow">↓</div>
+                    <div>INTEGRAÇÃO</div>
+                    <div class="arrow">↓</div>
+                    <div>DEPLOY</div>
+                    <div class="arrow">↓</div>
+                    <div>CONHECIMENTO</div>
+                </div>
+            </article>
+
+            <!-- SOBRE ESTE LIVRO -->
+            <article class="page-section" id="sobre">
+                <h2>Sobre este livro</h2>
+                <p>Este não é um livro para decorar tecnologias. É um livro para aprender a construir.</p>
+                <p>Através de um sistema real, cada decisão será analisada sob três perguntas fundamentais:</p>
+                
+                <div class="arch-card" style="border-left-color: var(--text-heading);">
+                    <div class="arch-item">
+                        <span class="arch-label">O QUE?</span><br>
+                        O que estamos construindo?
+                    </div>
+                    <div class="arch-item">
+                        <span class="arch-label">POR QUÊ?</span><br>
+                        Por que precisamos disso?
+                    </div>
+                    <div class="arch-item">
+                        <span class="arch-label">COMO?</span><br>
+                        Como isso é implementado?
+                    </div>
+                </div>
+                
+                <p>O objetivo é desenvolver conhecimento fundacional em engenharia de software que sobreviva à troca de linguagem, framework ou ferramenta de IA.</p>
+            </article>
+
+            <!-- INTRODUÇÃO -->
+            <article class="page-section" id="introducao">
+                <h2>Introdução</h2>
+                <p>Este projeto nasceu de uma pergunta fundamental:</p>
+                
+                <blockquote style="font-size: 1.25rem; font-style: italic; color: var(--primary); padding-left: 1rem; border-left: 4px solid var(--border); margin: 2rem 0;">
+                    "Como aprender microsserviços de verdade, sem apenas copiar arquiteturas prontas ou depender da IA para escrever código?"
+                </blockquote>
+                
+                <p>A resposta será encontrada através da <strong>construção</strong>.</p>
+                
+                <p>O projeto utilizará o <em>eShopOnContainers</em> original como nosso primeiro laboratório. <strong>Importante:</strong> Não iremos alterar o código original apenas para simplificar o aprendizado.</p>
+                
+                <ul>
+                    <li>Primeiro entenderemos como o sistema original funciona.</li>
+                    <li>Depois analisaremos suas decisões arquiteturais.</li>
+                    <li>Somente posteriormente discutiremos modernizações, alternativas e melhorias.</li>
+                </ul>
+            </article>
+
+            <!-- FILOSOFIA -->
+            <article class="page-section" id="filosofia">
+                <h2>Como utilizar este livro</h2>
+                <p>A pessoa que acompanha este projeto não deve apenas copiar código. Ela deve conseguir explicar o que está fazendo, por que está fazendo e como uma tecnologia diferente resolveria o mesmo problema.</p>
+                
+                <h3>O Fluxo de Trabalho</h3>
+                <div class="visual-flow">
+                    <div>1. Entenda</div>
+                    <div class="arrow">↓</div>
+                    <div>2. Observe o problema</div>
+                    <div class="arrow">↓</div>
+                    <div>3. Analise a solução</div>
+                    <div class="arrow">↓</div>
+                    <div>4. Construa</div>
+                    <div class="arrow">↓</div>
+                    <div>5. Execute</div>
+                    <div class="arrow">↓</div>
+                    <div>6. Teste</div>
+                    <div class="arrow">↓</div>
+                    <div>7. Questione</div>
+                    <div class="arrow">↓</div>
+                    <div>8. Documente</div>
+                </div>
+
+                <h3>As Perguntas Essenciais</h3>
+                <ul>
+                    <li>O que estou fazendo?</li>
+                    <li>Por que estou fazendo?</li>
+                    <li>Como funciona?</li>
+                    <li>O que aconteceria se eu não fizesse?</li>
+                    <li>Como outra tecnologia resolveria o mesmo problema?</li>
+                </ul>
+            </article>
+
+            <!-- MAPA VISUAL -->
+            <article class="page-section" id="mapa">
+                <h2>A Construção (Mapa Visual)</h2>
+                <p>Esta estrutura inicial está preparada para crescer conforme novos microsserviços forem estudados e acoplados ao sistema.</p>
+                
+                <div class="diagram-container">
+                    <div class="tree-diagram">
+                        <div class="tree-node tree-node-main">E-COMMERCE</div>
+                        <div class="tree-children">
+                            <div class="tree-child">
+                                <div class="service">CATALOG</div>
+                                <div class="domain">produtos</div>
+                            </div>
+                            <div class="tree-child">
+                                <div class="service">BASKET</div>
+                                <div class="domain">carrinho</div>
+                            </div>
+                            <div class="tree-child">
+                                <div class="service">ORDERING</div>
+                                <div class="domain">pedidos</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ==========================================
+                 SUMÁRIO MESTRE: O MAPA DA CONSTRUÇÃO
+                 ========================================== -->
+            <article class="page-section" id="sumario-mestre">
+                <div id="indice"></div>
+                <!-- Hero com Métricas da Construção -->
+                <div class="master-summary-hero">
+                    <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#60a5fa; font-weight:700;">ARQUITETURA & MÉTODO</span>
+                    <h2>SUMÁRIO MESTRE: O MAPA DA CONSTRUÇÃO</h2>
+                    <p>O roteiro sistemático de engenharia para construir microsserviços resilientes. Não é uma lista para decorar: é o processo prático, replicável e independente de tecnologia para erguer qualquer sistema do requisito ao deploy.</p>
+                    
+                    <div class="progress-stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="statTotalSteps">113</div>
+                            <div class="stat-label">Etapas Totais</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statCompletedSteps" style="color:#34d399;">5</div>
+                            <div class="stat-label">Concluídas</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statInProgressSteps" style="color:#fbbf24;">5</div>
+                            <div class="stat-label">Em Andamento</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statNextSteps" style="color:#60a5fa;">3</div>
+                            <div class="stat-label">Próximas</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statPlannedSteps" style="color:#94a3b8;">100</div>
+                            <div class="stat-label">A Construir</div>
+                        </div>
+                    </div>
+
+                    <div class="master-progress-track">
+                        <div class="progress-segment concluido" style="width: 4.4%;" title="Concluído"></div>
+                        <div class="progress-segment andamento" style="width: 4.4%;" title="Em andamento"></div>
+                        <div class="progress-segment proximo" style="width: 2.7%;" title="Próximo"></div>
+                    </div>
+
+                    <div class="progress-legend">
+                        <div class="legend-item"><span class="status-dot concluido"></span> <strong>✓ Concluído:</strong> Implementado e validado</div>
+                        <div class="legend-item"><span class="status-dot andamento"></span> <strong>● Em andamento:</strong> Modelagem e requisitos atuais</div>
+                        <div class="legend-item"><span class="status-dot proximo"></span> <strong>○ Próximo:</strong> Imediato na sequência</div>
+                        <div class="legend-item"><span class="status-dot planejado"></span> <strong>○ A construir:</strong> Construção incremental com o código</div>
+                    </div>
+                </div>
+
+                <!-- 1. Conceito Central: A Metáfora da Casa -->
+                <div class="metaphor-section">
+                    <h3>O Conceito Central: Construindo uma Casa de Software</h3>
+                    <p>Você não constrói um prédio comprando as cortinas primeiro. O software exige a mesma solidez de fundações. O leitor deste livro acompanha a obra em cada uma das suas 9 fases:</p>
+                    
+                    <div class="house-steps-grid">
+                        <div class="house-step-card">
+                            <div class="house-step-badge">Fase 1 • Cap. 1</div>
+                            <div class="house-step-title">📐 PLANTA</div>
+                            <div class="house-step-desc">Entendendo o problema, delimitando escopo, requisitos e responsabilidades. O que pertence e o que não pertence ao serviço.</div>
+                        </div>
+                        <div class="house-step-card">
+                            <div class="house-step-badge">Fase 2 • Cap. 2</div>
+                            <div class="house-step-title">🧱 FUNDAÇÃO</div>
+                            <div class="house-step-desc">Domínio puro: entidades, Value Objects, invariantes e regras de negócio blindadas de frameworks ou bancos de dados.</div>
+                        </div>
+                        <div class="house-step-card">
+                            <div class="house-step-badge">Fase 3 • Cap. 3</div>
+                            <div class="house-step-title">🏛️ ESTRUTURA</div>
+                            <div class="house-step-desc">Casos de uso da Aplicação, DTOs de entrada/saída, handlers, orquestração e validação de comandos.</div>
+                        </div>
+                        <div class="house-step-card">
+                            <div class="house-step-badge">Fase 4 • Cap. 4</div>
+                            <div class="house-step-title">🧱 PAREDES</div>
+                            <div class="house-step-desc">Infraestrutura: mapeamento ORM, persistência em banco de dados, repositórios, migrations e integrações externas.</div>
+                        </div>
+                        <div class="house-step-card">
+                            <div class="house-step-badge">Fase 5 • Cap. 5 a 7</div>
+                            <div class="house-step-title">⚡ INSTALAÇÕES</div>
+                            <div class="house-step-desc">API HTTP moderna, comunicação síncrona/assíncrona por eventos/mensageria e proteção com segurança e tokens.</div>
+                        </div>
+                        <div class="house-step-card">
+                            <div class="house-step-badge">Fase 6 • Cap. 8 e 9</div>
+                            <div class="house-step-title">🔍 INSPEÇÃO & CONTROLE</div>
+                            <div class="house-step-desc">Testes automatizados (unitários, integração, API) e observabilidade (logs estruturados, correlation IDs, traces e métricas).</div>
+                        </div>
+                        <div class="house-step-card">
+                            <div class="house-step-badge">Fase 7 • Cap. 10 e 11</div>
+                            <div class="house-step-title">📦 HABITE-SE & MUDANÇA</div>
+                            <div class="house-step-desc">Containerização em Docker, Docker Compose para ambiente local, pipelines de CI/CD automatizados e estratégias de rollback.</div>
+                        </div>
+                        <div class="house-step-card">
+                            <div class="house-step-badge">Fase 8 • Cap. 12 a 14</div>
+                            <div class="house-step-title">🛡️ REFORÇO & EVOLUÇÃO</div>
+                            <div class="house-step-desc">Resiliência distribuída (retry, circuit breaker, rate limit), refatoração, evolução de versão e fundamentação de decisões de arquitetura.</div>
+                        </div>
+                        <div class="house-step-card">
+                            <div class="house-step-badge">Fase 9 • Cap. 15</div>
+                            <div class="house-step-title">🌐 CIDADE CONECTADA</div>
+                            <div class="house-step-desc">Do código isolado ao sistema distribuído: múltiplos microsserviços colaborando via eventos, gateways e bancos independentes.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Regra Principal do Método: Fluxo Mental Reutilizável -->
+                <div class="methodology-box">
+                    <h3>O Método de Construção Reutilizável</h3>
+                    <p>Não ensinamos o leitor a decorar nomes de classes nem receitas pré-fabricadas. Ensinamos a pensar o ciclo de engenharia:</p>
+                    
+                    <div class="mental-flow-strip">
+                        <span class="flow-step">REQUISITO</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">ENTENDER</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">DECIDIR ONDE PERTENCE</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">MODELAR</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">IMPLEMENTAR</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">TESTAR</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">VALIDAR</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">INTEGRAR</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">PUBLICAR</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">EVOLUIR</span>
+                    </div>
+
+                    <p>Esse método é o mesmo se você estiver construindo uma loja, uma farmácia ou um hospital. O domínio muda, o processo de construção permanece:</p>
+
+                    <table class="domain-comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Domínio de Exemplo</th>
+                                <th>Entidade Central</th>
+                                <th>Fronteira de Negócio</th>
+                                <th>Aplicação do Método</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>E-Commerce (Loja)</strong></td>
+                                <td><code>Product</code> (Produto)</td>
+                                <td>Catálogo de itens vendáveis</td>
+                                <td>Requisito → Domínio isolado → API de catálogo</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Farmácia</strong></td>
+                                <td><code>Medicine</code> (Medicamento)</td>
+                                <td>Estoque e retenção de receita</td>
+                                <td>Requisito → Regras de dosagem → Validação</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Hospital</strong></td>
+                                <td><code>Patient</code> (Paciente)</td>
+                                <td>Prontuário e internação</td>
+                                <td>Requisito → Histórico clínico → Auditoria</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Financeiro / Banco</strong></td>
+                                <td><code>Account</code> (Conta)</td>
+                                <td>Saldos e lançamentos</td>
+                                <td>Requisito → Imutabilidade contábil → Consistência</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 3. Relação com o Laboratório Prático -->
+                <div class="arch-card" style="border-left-color: var(--primary);">
+                    <h4>Laboratório Vivo de Engenharia</h4>
+                    <div class="arch-title">Projeto Catalog & eShopOnContainers</div>
+                    <div class="arch-item"><span class="arch-label">Prática:</span> O livro é construído passo a passo junto com a implementação real do projeto <code>microservices-net</code>.</div>
+                    <div class="arch-item"><span class="arch-label">Postura Crítica:</span> Não reproduzimos o eShop antigo cegamente. Entendemos o problema, implementamos com as ferramentas modernas do .NET 10, comparamos abordagens e registramos os trade-offs.</div>
+                    <div class="arch-item"><span class="arch-label">Regra de Escrita:</span> O conteúdo técnico não é inventado antecipadamente. Ele nasce do ciclo: <code>CONSTRUIR → ENTENDER → VALIDAR → DOCUMENTAR</code>.</div>
+                </div>
+
+                <!-- 4. Grade dos 15 Capítulos (Roadmap Interativo) -->
+                <h3 style="margin-top:2.5rem; margin-bottom: 0.5rem;">Os 15 Capítulos da Construção</h3>
+                <p>Navegue diretamente para qualquer capítulo ou etapa da construção:</p>
+                
+                <div class="roadmap-chapters-list" id="roadmapChaptersContainer">
+                    <!-- Gerado dinamicamente via JS com status em tempo real -->
+                </div>
+            </article>
+
+            <!-- ==========================================
+                 CAPÍTULO 1: ENTENDENDO O PROBLEMA
+                 ========================================== -->
+            <article class="page-section" id="cap-01-sec-01">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 1 • ENTENDENDO O PROBLEMA</span>
+                        <h2 style="margin:0.25rem 0 0 0;">1.1 Requisito</h2>
+                    </div>
+                    <span class="status-badge andamento"><span class="status-dot andamento"></span> ● Em andamento</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Objetivo desta etapa</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Compreender a necessidade do usuário e a dor do negócio antes de encostar em qualquer ferramenta tecnológica.</p>
+                </div>
+
+                <h3>O QUE É?</h3>
+                <p>O requisito é a declaração explícita do que o sistema precisa realizar para gerar valor. Em arquitetura de software, nunca começamos escolhendo tecnologias (como Docker, Kafka, EF Core ou banco de dados). Começamos entendendo o <strong>problema</strong> que precisa ser resolvido.</p>
+
+                <h3>NO MICROSSERVIÇO CATALOG</h3>
+                <p>No laboratório do nosso sistema de comércio eletrônico, o microsserviço <strong>Catalog</strong> atende a três requisitos fundamentais:</p>
+                
+                <div class="recipe-card">
+                    <h4><span>📋</span> Requisitos de Negócio do Catalog</h4>
+                    <div class="recipe-row"><span class="recipe-label">1. Vitrine de Produtos:</span> Exibir para os visitantes os produtos disponíveis, com foto, descrição, preço e especificação.</div>
+                    <div class="recipe-row"><span class="recipe-label">2. Classificação:</span> Permitir busca por texto, filtro por Marca (Brand) e filtro por Categoria/Tipo (Type).</div>
+                    <div class="recipe-row"><span class="recipe-label">3. Gestão de Estoque no Catálogo:</span> Permitir cadastro, atualização de preço e alteração de quantidade disponível para compra.</div>
+                </div>
+
+                <div class="arch-card">
+                    <h4>Princípio de Engenharia</h4>
+                    <div class="arch-title">O Requisito dita o Limite do Serviço</div>
+                    <div class="arch-item"><span class="arch-label">Regra:</span> Se você não tem clareza sobre o requisito, qualquer decisão técnica subsequente será um tiro no escuro.</div>
+                    <div class="arch-item"><span class="arch-label">Reutilização:</span> Em uma farmácia, o requisito é listar <em>Medicamentos</em> e dosagens. Em um hospital, listar <em>Pacientes</em> e leitos. O método de captura do requisito é o mesmo.</div>
+                </div>
+
+                <div class="section-nav-flow">
+                    <a href="#sumario-mestre" onclick="navigateTo('sumario-mestre')">← Voltar ao Sumário Mestre</a>
+                    <a href="#cap-01-sec-02" onclick="navigateTo('cap-01-sec-02')">Próximo: 1.2 Contexto do microsserviço →</a>
+                </div>
+            </article>
+
+            <article class="page-section" id="cap-01-sec-02">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 1 • ENTENDENDO O PROBLEMA</span>
+                        <h2 style="margin:0.25rem 0 0 0;">1.2 Contexto do microsserviço</h2>
+                    </div>
+                    <span class="status-badge andamento"><span class="status-dot andamento"></span> ● Em andamento</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Objetivo desta etapa</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Definir o Contexto Delimitado (Bounded Context) e estabelecer onde o serviço vive no ecossistema.</p>
+                </div>
+
+                <h3>O QUE É?</h3>
+                <p>Em Domain-Driven Design (DDD), um microsserviço não deve tentar abraçar o mundo. Ele opera dentro de uma fronteira semântica bem definida: o <strong>Bounded Context</strong>. Dentro dessa fronteira, termos e modelos têm um significado estrito e compartilhado por todos.</p>
+
+                <h3>O CONTEXTO DO CATALOG</h3>
+                <p>O Catalog é a autoridade central e exclusiva sobre as especificações de produtos comercializados pela plataforma:</p>
+                <ul>
+                    <li>Ele é quem sabe quais produtos existem, quanto custam como preço base, suas descrições e imagens.</li>
+                    <li>Ele <strong>não</strong> conhece regras de promoção de checkout, taxas tributárias individuais ou se a entrega será feita por transportadora X ou Y.</li>
+                    <li>Para o Catalog, um produto é uma especificação vendável; para o serviço de frete, o produto é apenas peso e volume cúbico.</li>
+                </ul>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-01-sec-01" onclick="navigateTo('cap-01-sec-01')">← Anterior: 1.1 Requisito</a>
+                    <a href="#cap-01-sec-03" onclick="navigateTo('cap-01-sec-03')">Próximo: 1.3 Responsabilidades →</a>
+                </div>
+            </article>
+
+            <article class="page-section" id="cap-01-sec-03">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 1 • ENTENDENDO O PROBLEMA</span>
+                        <h2 style="margin:0.25rem 0 0 0;">1.3 Responsabilidades</h2>
+                    </div>
+                    <span class="status-badge andamento"><span class="status-dot andamento"></span> ● Em andamento</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Objetivo desta etapa</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Fixar as obrigações que este microsserviço deve cumprir com autonomia perante os demais componentes.</p>
+                </div>
+
+                <h3>RESPONSABILIDADES CENTRAIS</h3>
+                <p>Para manter o serviço desacoplado e autônomo, ele assume compromissos contratuais claros:</p>
+                <ul>
+                    <li><strong>Integridade dos Dados:</strong> Garantir que nenhum produto seja salvo com preço negativo, sem nome ou sem tipo associado.</li>
+                    <li><strong>Leitura Eficiente:</strong> Responder com extrema rapidez consultas de catálogo e listagens paginadas (a maior parte do tráfego de um e-commerce é leitura).</li>
+                    <li><strong>Autonomia de Armazenamento:</strong> Possuir seu próprio banco de dados isolado, permitindo evoluções de esquema sem pedir licença a outros microsserviços.</li>
+                </ul>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-01-sec-02" onclick="navigateTo('cap-01-sec-02')">← Anterior: 1.2 Contexto</a>
+                    <a href="#cap-01-sec-04" onclick="navigateTo('cap-01-sec-04')">Próximo: 1.4 O que pertence ao microsserviço →</a>
+                </div>
+            </article>
+
+            <article class="page-section" id="cap-01-sec-04">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 1 • ENTENDENDO O PROBLEMA</span>
+                        <h2 style="margin:0.25rem 0 0 0;">1.4 O que pertence ao microsserviço</h2>
+                    </div>
+                    <span class="status-badge andamento"><span class="status-dot andamento"></span> ● Em andamento</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Objetivo desta etapa</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Listar tudo aquilo sobre o qual este serviço tem autoridade e responsabilidade exclusiva.</p>
+                </div>
+
+                <h3>O QUE MORA DENTRO DO CATALOG</h3>
+                <ul>
+                    <li>Entidade de Produto (nome, descrição, preço de tabela, URI de imagem).</li>
+                    <li>Entidade de Marca do Produto (<code>CatalogBrand</code>).</li>
+                    <li>Entidade de Categoria/Tipo de Produto (<code>CatalogType</code>).</li>
+                    <li>Controle da quantidade física disponível em depósito (estoque base).</li>
+                    <li>Regras de validação do domínio de produto.</li>
+                    <li>Persistência direta dessas tabelas em seu próprio banco.</li>
+                </ul>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-01-sec-03" onclick="navigateTo('cap-01-sec-03')">← Anterior: 1.3 Responsabilidades</a>
+                    <a href="#cap-01-sec-05" onclick="navigateTo('cap-01-sec-05')">Próximo: 1.5 O que não pertence →</a>
+                </div>
+            </article>
+
+            <article class="page-section" id="cap-01-sec-05">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 1 • ENTENDENDO O PROBLEMA</span>
+                        <h2 style="margin:0.25rem 0 0 0;">1.5 O que não pertence</h2>
+                    </div>
+                    <span class="status-badge andamento"><span class="status-dot andamento"></span> ● Em andamento</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Objetivo desta etapa</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Traçar a linha vermelha que impede acoplamento indevido e o nascimento de um monólito distribuído.</p>
+                </div>
+
+                <h3>A LINHA VERMELHA DO ISOLAMENTO</h3>
+                <p>Saber o que <strong>NÃO</strong> fazer é tão importante quanto saber o que fazer. O Catalog nunca deve conter:</p>
+                
+                <div class="arch-card" style="border-left-color: #ef4444;">
+                    <h4>O que está ESTRITAMENTE FORA do Catalog</h4>
+                    <div class="arch-item"><span class="arch-label">❌ Carrinho de Compras:</span> Pertence ao microsserviço <code>Basket</code>. O carrinho é volátil e baseado em sessão/usuário.</div>
+                    <div class="arch-item"><span class="arch-label">❌ Pedidos e Faturamento:</span> Pertence ao microsserviço <code>Ordering</code>.</div>
+                    <div class="arch-item"><span class="arch-label">❌ Autenticação de Usuários:</span> Pertence ao microsserviço <code>Identity</code>.</div>
+                    <div class="arch-item"><span class="arch-label">❌ Processamento de Pagamento:</span> Pertence ao serviço de pagamentos.</div>
+                </div>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-01-sec-04" onclick="navigateTo('cap-01-sec-04')">← Anterior: 1.4 O que pertence</a>
+                    <a href="#cap-01-sec-06" onclick="navigateTo('cap-01-sec-06')">Próximo: 1.6 Fluxos principais →</a>
+                </div>
+            </article>
+
+            <article class="page-section" id="cap-01-sec-06">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 1 • ENTENDENDO O PROBLEMA</span>
+                        <h2 style="margin:0.25rem 0 0 0;">1.6 Fluxos principais</h2>
+                    </div>
+                    <span class="status-badge proximo"><span class="status-dot proximo"></span> ○ Próximo</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Objetivo desta etapa</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Mapear o fluxo de dados em cada operação típica do serviço antes de desenhar endpoints.</p>
+                </div>
+
+                <h3>FLUXOS MAPEADOS</h3>
+                <ol>
+                    <li><strong>Fluxo de Consulta Paginada:</strong> Cliente envia página, tamanho, filtro de tipo e marca → API valida parâmetros → Consulta filtrada no banco → Retorna página com totalizadores.</li>
+                    <li><strong>Fluxo de Detalhes do Produto:</strong> Cliente solicita produto por ID → Consulta direta em cache/banco → Retorna DTO do produto ou 404 Not Found.</li>
+                    <li><strong>Fluxo de Cadastro / Alteração de Preço:</strong> Administrador envia comando → Validação na camada de Aplicação → Entidade aplica invariantes no Domínio → Persistência no Repositório → Publicação de evento de preço atualizado.</li>
+                </ol>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-01-sec-05" onclick="navigateTo('cap-01-sec-05')">← Anterior: 1.5 O que não pertence</a>
+                    <a href="#cap-01-sec-07" onclick="navigateTo('cap-01-sec-07')">Próximo: 1.7 Primeiro desenho da solução →</a>
+                </div>
+            </article>
+
+            <article class="page-section" id="cap-01-sec-07">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 1 • ENTENDENDO O PROBLEMA</span>
+                        <h2 style="margin:0.25rem 0 0 0;">1.7 Primeiro desenho da solução</h2>
+                    </div>
+                    <span class="status-badge proximo"><span class="status-dot proximo"></span> ○ Próximo</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Objetivo desta etapa</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Estabelecer a arquitetura de camadas limpas e a direção de dependências que sustentarão o código.</p>
+                </div>
+
+                <h3>ARQUITETURA EM CAMADAS LIMPAS (CLEAN ARCHITECTURE)</h3>
+                <p>Decidimos separar fisicamente a solução em quatro projetos distintos para que o compilador proteja a arquitetura:</p>
+                
+                <div class="visual-flow">
+                    <div style="background:#eff6ff; border:1px solid var(--primary); padding:0.5rem 1rem; border-radius:4px;">Catalog.API (Entrypoint HTTP Minimal APIs)</div>
+                    <div class="arrow">↓ referencia</div>
+                    <div style="background:#eff6ff; border:1px solid var(--primary); padding:0.5rem 1rem; border-radius:4px;">Catalog.Infrastructure (Banco de Dados / Adapters) & Catalog.Application</div>
+                    <div class="arrow">↓ referencia</div>
+                    <div style="background:#ecfdf5; border:1px solid #10b981; padding:0.5rem 1rem; border-radius:4px; font-weight:bold; color:#065f46;">Catalog.Domain (O Núcleo Puro - Zero Dependências)</div>
+                </div>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-01-sec-06" onclick="navigateTo('cap-01-sec-06')">← Anterior: 1.6 Fluxos principais</a>
+                    <a href="#cap-02-sec-01" onclick="navigateTo('cap-02-sec-01')">Próximo: 2.1 Criando o projeto Domain →</a>
+                </div>
+            </article>
+
+            <!-- ==========================================
+                 CAPÍTULO 2: DOMÍNIO (SEÇÃO CONCLUÍDA)
+                 ========================================== -->
+            <article class="page-section" id="cap-02-sec-01">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 2 • DOMÍNIO</span>
+                        <h2 style="margin:0.25rem 0 0 0;">2.1 Criando o projeto Domain</h2>
+                    </div>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Criação do projeto de Class Library para abrigar as entidades, regras de negócio e interfaces do microsserviço.</p>
+                </div>
+
+                <h3>O QUE FIZEMOS?</h3>
+                <p>Criamos o projeto <code>Catalog.Domain.csproj</code> utilizando .NET 10 puro, sem nenhuma dependência de pacotes externos, sem Entity Framework e sem ASP.NET Core.</p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.Domain/Catalog.Domain.csproj</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>&lt;Project Sdk="Microsoft.NET.Sdk"&gt;
+
+  &lt;PropertyGroup&gt;
+    &lt;TargetFramework&gt;net10.0&lt;/TargetFramework&gt;
+    &lt;ImplicitUsings&gt;enable&lt;/ImplicitUsings&gt;
+    &lt;Nullable&gt;enable&lt;/Nullable&gt;
+  &lt;/PropertyGroup&gt;
+
+&lt;/Project&gt;</code></pre>
+                </div>
+
+                <div class="arch-card">
+                    <h4>Decisão Arquitetural</h4>
+                    <div class="arch-title">Domínio Puro e Agnóstico</div>
+                    <div class="arch-item"><span class="arch-label">Por quê?</span> O núcleo de negócio não deve mudar quando trocamos o banco de dados de PostgreSQL para SQL Server ou de Entity Framework para Dapper.</div>
+                    <div class="arch-item"><span class="arch-label">Trade-off no eShop legado:</span> No eShopOnContainers original, muitas vezes pastas de infraestrutura conviviam no mesmo projeto da API, facilitando vazamento de dependências. A separação física em <code>Catalog.Domain</code> elimina esse risco.</div>
+                </div>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-01-sec-07" onclick="navigateTo('cap-01-sec-07')">← Anterior: 1.7 Desenho da solução</a>
+                    <a href="#cap-02-sec-02" onclick="navigateTo('cap-02-sec-02')">Próximo: 2.2 Identificando as entidades →</a>
+                </div>
+            </article>
+
+            <!-- ==========================================
+                 CAPÍTULO 3: APLICAÇÃO (SEÇÃO CONCLUÍDA)
+                 ========================================== -->
+            <article class="page-section" id="cap-03-sec-01">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 3 • APLICAÇÃO</span>
+                        <h2 style="margin:0.25rem 0 0 0;">3.1 Criando o projeto Application</h2>
+                    </div>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Criação da camada de orquestração de casos de uso do microsserviço Catalog.</p>
+                </div>
+
+                <h3>O QUE FIZEMOS?</h3>
+                <p>Criamos o projeto <code>Catalog.Application.csproj</code>. Ele possui apenas uma dependência interna: uma referência de projeto direta para <code>Catalog.Domain</code>.</p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.Application/Catalog.Application.csproj</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>&lt;Project Sdk="Microsoft.NET.Sdk"&gt;
+
+  &lt;PropertyGroup&gt;
+    &lt;TargetFramework&gt;net10.0&lt;/TargetFramework&gt;
+    &lt;ImplicitUsings&gt;enable&lt;/ImplicitUsings&gt;
+    &lt;Nullable&gt;enable&lt;/Nullable&gt;
+  &lt;/PropertyGroup&gt;
+
+  &lt;ItemGroup&gt;
+    &lt;ProjectReference Include="..\Catalog.Domain\Catalog.Domain.csproj" /&gt;
+  &lt;/ItemGroup&gt;
+
+&lt;/Project&gt;</code></pre>
+                </div>
+
+                <p>Aqui ficarão os comandos, consultas, DTOs e validações da aplicação, sem poluir a API com lógica de orquestração.</p>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-02-sec-08" onclick="navigateTo('cap-02-sec-08')">← Anterior: 2.8 Testando o domínio</a>
+                    <a href="#cap-03-sec-02" onclick="navigateTo('cap-03-sec-02')">Próximo: 3.2 Casos de uso →</a>
+                </div>
+            </article>
+
+            <!-- ==========================================
+                 CAPÍTULO 4: INFRAESTRUTURA (SEÇÃO CONCLUÍDA)
+                 ========================================== -->
+            <article class="page-section" id="cap-04-sec-01">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 4 • INFRAESTRUTURA</span>
+                        <h2 style="margin:0.25rem 0 0 0;">4.1 Criando o projeto Infrastructure</h2>
+                    </div>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Criação da camada técnica onde residem os adaptadores de banco de dados e integrações.</p>
+                </div>
+
+                <h3>O QUE FIZEMOS?</h3>
+                <p>Criamos o projeto <code>Catalog.Infrastructure.csproj</code> referenciando <code>Catalog.Domain</code> e <code>Catalog.Application</code>. É aqui que implementaremos as abstrações de repositório, DbContexts e comunicações com bancos e serviços externos.</p>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-03-sec-09" onclick="navigateTo('cap-03-sec-09')">← Anterior: 3.9 Testando casos de uso</a>
+                    <a href="#cap-04-sec-02" onclick="navigateTo('cap-04-sec-02')">Próximo: 4.2 Banco de dados →</a>
+                </div>
+            </article>
+
+            <!-- ==========================================
+                 CAPÍTULO 5: API (SEÇÕES CONCLUÍDAS)
+                 ========================================== -->
+            <article class="page-section" id="cap-05-sec-01">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 5 • API</span>
+                        <h2 style="margin:0.25rem 0 0 0;">5.1 Criando o projeto API</h2>
+                    </div>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Criação do entrypoint executável da aplicação web com ASP.NET Core e .NET 10.</p>
+                </div>
+
+                <h3>O QUE FIZEMOS?</h3>
+                <p>Criamos o projeto <code>Catalog.API.csproj</code> utilizando o SDK Web do .NET 10. Ele referencia <code>Catalog.Application</code> e <code>Catalog.Infrastructure</code> para registrar as injeções de dependência.</p>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-04-sec-10" onclick="navigateTo('cap-04-sec-10')">← Anterior: 4.10 Testando infraestrutura</a>
+                    <a href="#cap-05-sec-02" onclick="navigateTo('cap-05-sec-02')">Próximo: 5.2 Configuração da aplicação →</a>
+                </div>
+            </article>
+
+            <article class="page-section" id="cap-05-sec-09">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 5 • API</span>
+                        <h2 style="margin:0.25rem 0 0 0;">5.9 Health Check</h2>
+                    </div>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Configuração do endpoint de diagnóstico e saúde da aplicação.</p>
+                </div>
+
+                <h3>O QUE FIZEMOS?</h3>
+                <p>Em sistemas distribuídos e orquestrados (como Docker Compose e Kubernetes), é indispensável que cada serviço informe seu estado de saúde para roteadores e balanceadores de carga. Configuramos os Health Checks no <code>Program.cs</code>:</p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.API/Program.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>var builder = WebApplication.CreateBuilder(args);
+
+// Adiciona serviço nativo de Health Checks
+builder.Services.AddHealthChecks();
+
+var app = builder.Build();
+
+// Mapeia o endpoint de saúde
+app.MapHealthChecks("/health");
+
+app.MapGet("/", () => "Catalog API está online!");
+
+app.Run();</code></pre>
+                </div>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-05-sec-08" onclick="navigateTo('cap-05-sec-08')">← Anterior: 5.8 Swagger</a>
+                    <a href="#cap-05-sec-10" onclick="navigateTo('cap-05-sec-10')">Próximo: 5.10 Testando a API →</a>
+                </div>
+            </article>
+
+
+            <!-- TEMPLATE / EXEMPLO DE CAPÍTULO -->
+            <article class="page-section" id="template-capitulo">
+                <div class="learning-box">
+                    <h4>O que vamos aprender</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Este é um capítulo de demonstração para apresentar os componentes visuais que compõem o livro. Nenhum conteúdo técnico real foi inventado nesta etapa.</p>
+                </div>
+
+                <div class="construction-notice">
+                    🚧 Este capítulo será desenvolvido durante a implementação do projeto.
+                </div>
+
+                <h3>O QUE É?</h3>
+                <p>Texto explicativo direto sobre o conceito. Sem jargões desnecessários.</p>
+
+                <h3>POR QUE EXISTE?</h3>
+                <p>A justificativa do problema que esta peça de software resolve.</p>
+
+                <h3>COMO O .NET IMPLEMENTA?</h3>
+                
+                <!-- Componente: Receita -->
+                <div class="recipe-card">
+                    <h4><span>🍳</span> RECEITA: Exemplo de Construção</h4>
+                    <div class="recipe-row"><span class="recipe-label">Objetivo:</span> Demonstrar o componente visual de receita.</div>
+                    <div class="recipe-row"><span class="recipe-label">Ingredientes:</span> C#, .NET 8, Terminal.</div>
+                    <hr style="border: 0; border-top: 1px dashed #d97706; margin: 1rem 0;">
+                    <div class="recipe-row"><span class="recipe-label">Passo 1:</span> Entenda o problema.</div>
+                    <div class="recipe-row"><span class="recipe-label">Passo 2:</span> Execute o comando de scaffold.</div>
+                    <div class="recipe-row"><span class="recipe-label">Resultado:</span> O ambiente base configurado.</div>
+                    <div class="recipe-row"><span class="recipe-label">Validação:</span> Compile e rode os testes.</div>
+                </div>
+
+                <!-- Componente: Decisão Arquitetural -->
+                <div class="arch-card">
+                    <h4>Decisão Arquitetural</h4>
+                    <div class="arch-title">Separação de Banco de Dados por Serviço</div>
+                    <div class="arch-item"><span class="arch-label">Por quê?</span> Garantir autonomia e limites de contexto rígidos.</div>
+                    <div class="arch-item"><span class="arch-label">Benefício:</span> Um serviço não derruba o outro por lock no banco.</div>
+                    <div class="arch-item"><span class="arch-label">Trade-off:</span> Complexidade transacional (necessidade de consistência eventual).</div>
+                    <div class="arch-item"><span class="arch-label">Implementação .NET:</span> Múltiplos DbContexts separados.</div>
+                    <div class="arch-item"><span class="arch-label">Alternativa Java:</span> Spring Data JPA com datasources distintos.</div>
+                </div>
+
+                <!-- Componente: Código -->
+                <h3>CÓDIGO E CONTEXTO</h3>
+                <p>O código deve sempre ser acompanhado de contexto. Evite blocos gigantes sem explicação.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Program.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>var builder = WebApplication.CreateBuilder(args);
+
+// Adiciona serviços ao contêiner.
+builder.Services.AddControllers();
+
+var app = builder.Build();
+
+app.MapControllers();
+app.Run();</code></pre>
+                </div>
+                
+                <h3>O QUE APRENDEMOS?</h3>
+                <p>Resumo dos conceitos fixados.</p>
+
+                <h3>PRÓXIMO PASSO</h3>
+                <p>Qual o gancho para o próximo problema de engenharia.</p>
+            </article>
+
+            <!-- Rodapé Dinâmico para Navegação -->
+            <div class="footer-nav" id="footerNav">
+                <!-- Preenchido via JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- ==========================================
+         INÍCIO DO BLOCO JAVASCRIPT & DADOS 
+         (Futuro js/book.js e data/book.json)
+         ========================================== -->
+    <script>
+        /**
+         * ESTRUTURA DE DADOS MESTRE DO LIVRO
+         * 15 Capítulos permanentes com subdivisões numeradas e status de construção vivo.
+         */
+        const bookData = {
+            inicio: [
+                { id: "capa", title: "Capa" },
+                { id: "visao-geral", title: "Visão Geral" },
+                { id: "sobre", title: "Sobre este livro" },
+                { id: "introducao", title: "Introdução" },
+                { id: "filosofia", title: "Como utilizar" },
+                { id: "mapa", title: "Mapa Visual" },
+                { id: "sumario-mestre", title: "Sumário Mestre (Mapa da Construção)" },
+                { id: "template-capitulo", title: "Padrão de Capítulo" }
+            ],
+            chapters: [
+                {
+                    chapterNum: 1,
+                    chapterTitle: "Entendendo o Problema",
+                    phase: "Planta",
+                    desc: "Requisitos, fronteiras de negócio, escopo e primeiro desenho da solução.",
+                    items: [
+                        { id: "cap-01-sec-01", num: "1.1", title: "1.1 Requisito", status: "andamento" },
+                        { id: "cap-01-sec-02", num: "1.2", title: "1.2 Contexto do microsserviço", status: "andamento" },
+                        { id: "cap-01-sec-03", num: "1.3", title: "1.3 Responsabilidades", status: "andamento" },
+                        { id: "cap-01-sec-04", num: "1.4", title: "1.4 O que pertence ao microsserviço", status: "andamento" },
+                        { id: "cap-01-sec-05", num: "1.5", title: "1.5 O que não pertence", status: "andamento" },
+                        { id: "cap-01-sec-06", num: "1.6", title: "1.6 Fluxos principais", status: "proximo" },
+                        { id: "cap-01-sec-07", num: "1.7", title: "1.7 Primeiro desenho da solução", status: "proximo" }
+                    ]
+                },
+                {
+                    chapterNum: 2,
+                    chapterTitle: "Domínio",
+                    phase: "Fundação",
+                    desc: "Entidades ricas, Value Objects, invariantes e regras puras sem acoplamento a frameworks.",
+                    items: [
+                        { id: "cap-02-sec-01", num: "2.1", title: "2.1 Criando o projeto Domain", status: "concluido" },
+                        { id: "cap-02-sec-02", num: "2.2", title: "2.2 Identificando as entidades", status: "proximo" },
+                        { id: "cap-02-sec-03", num: "2.3", title: "2.3 Criando uma Entity", status: "planejado" },
+                        { id: "cap-02-sec-04", num: "2.4", title: "2.4 Regras de negócio", status: "planejado" },
+                        { id: "cap-02-sec-05", num: "2.5", title: "2.5 Value Objects", status: "planejado" },
+                        { id: "cap-02-sec-06", num: "2.6", title: "2.6 Relacionamentos", status: "planejado" },
+                        { id: "cap-02-sec-07", num: "2.7", title: "2.7 Abstrações necessárias", status: "planejado" },
+                        { id: "cap-02-sec-08", num: "2.8", title: "2.8 Testando o domínio", status: "planejado" }
+                    ]
+                },
+                {
+                    chapterNum: 3,
+                    chapterTitle: "Aplicação",
+                    phase: "Estrutura",
+                    desc: "Casos de uso, DTOs de entrada e saída, handlers e validação de comandos.",
+                    items: [
+                        { id: "cap-03-sec-01", num: "3.1", title: "3.1 Criando o projeto Application", status: "concluido" },
+                        { id: "cap-03-sec-02", num: "3.2", title: "3.2 Casos de uso", status: "planejado" },
+                        { id: "cap-03-sec-03", num: "3.3", title: "3.3 Request", status: "planejado" },
+                        { id: "cap-03-sec-04", num: "3.4", title: "3.4 Response", status: "planejado" },
+                        { id: "cap-03-sec-05", num: "3.5", title: "3.5 Service", status: "planejado" },
+                        { id: "cap-03-sec-06", num: "3.6", title: "3.6 Handler", status: "planejado" },
+                        { id: "cap-03-sec-07", num: "3.7", title: "3.7 Validação", status: "planejado" },
+                        { id: "cap-03-sec-08", num: "3.8", title: "3.8 Tratamento de erros", status: "planejado" },
+                        { id: "cap-03-sec-09", num: "3.9", title: "3.9 Testando os casos de uso", status: "planejado" }
+                    ]
+                },
+                {
+                    chapterNum: 4,
+                    chapterTitle: "Infraestrutura",
+                    phase: "Paredes",
+                    desc: "Persistência, ORM, repositórios concretos, migrations e integrações externas.",
+                    items: [
+                        { id: "cap-04-sec-01", num: "4.1", title: "4.1 Criando o projeto Infrastructure", status: "concluido" },
+                        { id: "cap-04-sec-02", num: "4.2", title: "4.2 Banco de dados", status: "planejado" },
+                        { id: "cap-04-sec-03", num: "4.3", title: "4.3 ORM / acesso a dados", status: "planejado" },
+                        { id: "cap-04-sec-04", num: "4.4", title: "4.4 Configuração", status: "planejado" },
+                        { id: "cap-04-sec-05", num: "4.5", title: "4.5 Repository", status: "planejado" },
+                        { id: "cap-04-sec-06", num: "4.6", title: "4.6 Implementação das abstrações", status: "planejado" },
+                        { id: "cap-04-sec-07", num: "4.7", title: "4.7 Migrations", status: "planejado" },
+                        { id: "cap-04-sec-08", num: "4.8", title: "4.8 Persistência", status: "planejado" },
+                        { id: "cap-04-sec-09", num: "4.9", title: "4.9 Integrações externas", status: "planejado" },
+                        { id: "cap-04-sec-10", num: "4.10", title: "4.10 Testando a infraestrutura", status: "planejado" }
+                    ]
+                },
+                {
+                    chapterNum: 5,
+                    chapterTitle: "API",
+                    phase: "Instalações",
+                    desc: "Entrypoint ASP.NET Core, Minimal APIs, Dependency Injection, Swagger e diagnósticos.",
+                    items: [
+                        { id: "cap-05-sec-01", num: "5.1", title: "5.1 Criando o projeto API", status: "concluido" },
+                        { id: "cap-05-sec-02", num: "5.2", title: "5.2 Configuração da aplicação", status: "planejado" },
+                        { id: "cap-05-sec-03", num: "5.3", title: "5.3 Dependency Injection", status: "planejado" },
+                        { id: "cap-05-sec-04", num: "5.4", title: "5.4 Endpoints", status: "planejado" },
+                        { id: "cap-05-sec-05", num: "5.5", title: "5.5 Request / Response HTTP", status: "planejado" },
+                        { id: "cap-05-sec-06", num: "5.6", title: "5.6 Validação", status: "planejado" },
+                        { id: "cap-05-sec-07", num: "5.7", title: "5.7 Tratamento de exceções", status: "planejado" },
+                        { id: "cap-05-sec-08", num: "5.8", title: "5.8 Swagger", status: "planejado" },
+                        { id: "cap-05-sec-09", num: "5.9", title: "5.9 Health Check", status: "concluido" },
+                        { id: "cap-05-sec-10", num: "5.10", title: "5.10 Testando a API", status: "planejado" }
+                    ]
+                },
+                {
+                    chapterNum: 6,
+                    chapterTitle: "Comunicação",
+                    phase: "Instalações",
+                    desc: "Comunicação síncrona e assíncrona, eventos, mensageria e garantia de idempotência.",
+                    items: [
+                        { id: "cap-06-sec-01", num: "6.1", title: "6.1 Comunicação síncrona", status: "planejado" },
+                        { id: "cap-06-sec-02", num: "6.2", title: "6.2 HTTP", status: "planejado" },
+                        { id: "cap-06-sec-03", num: "6.3", title: "6.3 Comunicação assíncrona", status: "planejado" },
+                        { id: "cap-06-sec-04", num: "6.4", title: "6.4 Eventos", status: "planejado" },
+                        { id: "cap-06-sec-05", num: "6.5", title: "6.5 Mensageria", status: "planejado" },
+                        { id: "cap-06-sec-06", num: "6.6", title: "6.6 Publicação de eventos", status: "planejado" },
+                        { id: "cap-06-sec-07", num: "6.7", title: "6.7 Consumo de eventos", status: "planejado" },
+                        { id: "cap-06-sec-08", num: "6.8", title: "6.8 Idempotência", status: "planejado" },
+                        { id: "cap-06-sec-09", num: "6.9", title: "6.9 Falhas de comunicação", status: "planejado" }
+                    ]
+                },
+                {
+                    chapterNum: 7,
+                    chapterTitle: "Segurança",
+                    phase: "Instalações",
+                    desc: "Autenticação, autorização baseada em tokens, gestão de segredos e proteção de rotas.",
+                    items: [
+                        { id: "cap-07-sec-01", num: "7.1", title: "7.1 Autenticação", status: "planejado" },
+                        { id: "cap-07-sec-02", num: "7.2", title: "7.2 Autorização", status: "planejado" },
+                        { id: "cap-07-sec-03", num: "7.3", title: "7.3 Tokens", status: "planejado" },
+                        { id: "cap-07-sec-04", num: "7.4", title: "7.4 Secrets", status: "planejado" },
+                        { id: "cap-07-sec-05", num: "7.5", title: "7.5 Configurações sensíveis", status: "planejado" },
+                        { id: "cap-07-sec-06", num: "7.6", title: "7.6 Proteção dos endpoints", status: "planejado" }
+                    ]
+                },
+                {
+                    chapterNum: 8,
+                    chapterTitle: "Testes",
+                    phase: "Inspeção",
+                    desc: "Pirâmide de testes: testes unitários de domínio, testes de integração de banco e testes de API.",
+                    items: [
+                        { id: "cap-08-sec-01", num: "8.1", title: "8.1 Testes unitários", status: "planejado" },
+                        { id: "cap-08-sec-02", num: "8.2", title: "8.2 Testes de integração", status: "planejado" },
+                        { id: "cap-08-sec-03", num: "8.3", title: "8.3 Testes de API", status: "planejado" },
+                        { id: "cap-08-sec-04", num: "8.4", title: "8.4 Testes de infraestrutura", status: "planejado" },
+                        { id: "cap-08-sec-05", num: "8.5", title: "8.5 Testes de comunicação", status: "planejado" },
+                        { id: "cap-08-sec-06", num: "8.6", title: "8.6 Testes funcionais", status: "planejado" },
+                        { id: "cap-08-sec-07", num: "8.7", title: "8.7 Estratégia de testes", status: "planejado" }
+                    ]
+                },
+                {
+                    chapterNum: 9,
+                    chapterTitle: "Observabilidade",
+                    phase: "Inspeção",
+                    desc: "Telemetria distribuída: logs estruturados, correlation IDs, traces e métricas com OpenTelemetry.",
+                    items: [
+                        { id: "cap-09-sec-01", num: "9.1", title: "9.1 Logs", status: "planejado" },
+                        { id: "cap-09-sec-02", num: "9.2", title: "9.2 Métricas", status: "planejado" },
+                        { id: "cap-09-sec-03", num: "9.3", title: "9.3 Tracing", status: "planejado" },
+                        { id: "cap-09-sec-04", num: "9.4", title: "9.4 Correlation ID", status: "planejado" },
+                        { id: "cap-09-sec-05", num: "9.5", title: "9.5 Monitoramento", status: "planejado" },
+                        { id: "cap-09-sec-06", num: "9.6", title: "9.6 Diagnóstico de problemas", status: "planejado" }
+                    ]
+                },
+                {
+                    chapterNum: 10,
+                    chapterTitle: "Containerização",
+                    phase: "Habite-se",
+                    desc: "Empacotamento com Docker multi-stage, otimização de imagem, Docker Compose e redes locais.",
+                    items: [
+                        { id: "cap-10-sec-01", num: "10.1", title: "10.1 Dockerfile", status: "planejado" },
+                        { id: "cap-10-sec-02", num: "10.2", title: "10.2 Imagem", status: "planejado" },
+                        { id: "cap-10-sec-03", num: "10.3", title: "10.3 Container", status: "planejado" },
+                        { id: "cap-10-sec-04", num: "10.4", title: "10.4 Variáveis de ambiente", status: "planejado" },
+                        { id: "cap-10-sec-05", num: "10.5", title: "10.5 Docker Compose", status: "planejado" },
+                        { id: "cap-10-sec-06", num: "10.6", title: "10.6 Comunicação entre containers", status: "planejado" }
+                    ]
+                },
+                {
+                    chapterNum: 11,
+                    chapterTitle: "Deploy",
+                    phase: "Habite-se",
+                    desc: "Pipelines de Integração e Entrega Contínua (CI/CD), builds automatizados e rollback.",
+                    items: [
+                        { id: "cap-11-sec-01", num: "11.1", title: "11.1 CI/CD", status: "planejado" },
+                        { id: "cap-11-sec-02", num: "11.2", title: "11.2 Build", status: "planejado" },
+                        { id: "cap-11-sec-03", num: "11.3", title: "11.3 Testes no pipeline", status: "planejado" },
+                        { id: "cap-11-sec-04", num: "11.4", title: "11.4 Imagem Docker", status: "planejado" },
+                        { id: "cap-11-sec-05", num: "11.5", title: "11.5 Deploy", status: "planejado" },
+                        { id: "cap-11-sec-06", num: "11.6", title: "11.6 Configuração por ambiente", status: "planejado" },
+                        { id: "cap-11-sec-07", num: "11.7", title: "11.7 Rollback", status: "planejado" }
+                    ]
+                },
+                {
+                    chapterNum: 12,
+                    chapterTitle: "Resiliência e Escalabilidade",
+                    phase: "Reforço",
+                    desc: "Tolerância a falhas distribuídas: retries, timeouts, circuit breakers, caching e rate limiting.",
+                    items: [
+                        { id: "cap-12-sec-01", num: "12.1", title: "12.1 Retry", status: "planejado" },
+                        { id: "cap-12-sec-02", num: "12.2", title: "12.2 Timeout", status: "planejado" },
+                        { id: "cap-12-sec-03", num: "12.3", title: "12.3 Circuit Breaker", status: "planejado" },
+                        { id: "cap-12-sec-04", num: "12.4", title: "12.4 Cache", status: "planejado" },
+                        { id: "cap-12-sec-05", num: "12.5", title: "12.5 Rate Limiting", status: "planejado" },
+                        { id: "cap-12-sec-06", num: "12.6", title: "12.6 Escalabilidade", status: "planejado" },
+                        { id: "cap-12-sec-07", num: "12.7", title: "12.7 Health Checks", status: "planejado" },
+                        { id: "cap-12-sec-08", num: "12.8", title: "12.8 Problemas distribuídos", status: "planejado" }
+                    ]
+                },
+                {
+                    chapterNum: 13,
+                    chapterTitle: "Evolução do Microsserviço",
+                    phase: "Reforço",
+                    desc: "Versionamento de contratos, compatibilidade retroativa, refatoração e débito técnico.",
+                    items: [
+                        { id: "cap-13-sec-01", num: "13.1", title: "13.1 Mudança de requisitos", status: "planejado" },
+                        { id: "cap-13-sec-02", num: "13.2", title: "13.2 Versionamento", status: "planejado" },
+                        { id: "cap-13-sec-03", num: "13.3", title: "13.3 Compatibilidade", status: "planejado" },
+                        { id: "cap-13-sec-04", num: "13.4", title: "13.4 Refatoração", status: "planejado" },
+                        { id: "cap-13-sec-05", num: "13.5", title: "13.5 Performance", status: "planejado" },
+                        { id: "cap-13-sec-06", num: "13.6", title: "13.6 Dívida técnica", status: "planejado" },
+                        { id: "cap-13-sec-07", num: "13.7", title: "13.7 Modernização de código legado", status: "planejado" }
+                    ]
+                },
+                {
+                    chapterNum: 14,
+                    chapterTitle: "Arquitetura e Decisões",
+                    phase: "Reforço",
+                    desc: "Registro de Decisões de Arquitetura (ADRs), avaliação de trade-offs e defesa técnica.",
+                    items: [
+                        { id: "cap-14-sec-01", num: "14.1", title: "14.1 Por que escolhemos essa solução?", status: "planejado" },
+                        { id: "cap-14-sec-02", num: "14.2", title: "14.2 Alternativas", status: "planejado" },
+                        { id: "cap-14-sec-03", num: "14.3", title: "14.3 Trade-offs", status: "planejado" },
+                        { id: "cap-14-sec-04", num: "14.4", title: "14.4 Quando usar outra abordagem?", status: "planejado" },
+                        { id: "cap-14-sec-05", num: "14.5", title: "14.5 Código novo versus legado", status: "planejado" },
+                        { id: "cap-14-sec-06", num: "14.6", title: "14.6 Como explicar uma decisão técnica", status: "planejado" }
+                    ]
+                },
+                {
+                    chapterNum: 15,
+                    chapterTitle: "Do Código ao Sistema",
+                    phase: "Cidade Conectada",
+                    desc: "Integração do ecossistema distribuído: múltiplos microsserviços, API Gateway e consistência eventual.",
+                    items: [
+                        { id: "cap-15-sec-01", num: "15.1", title: "15.1 Microsserviço isolado", status: "planejado" },
+                        { id: "cap-15-sec-02", num: "15.2", title: "15.2 Microsserviços conversando", status: "planejado" },
+                        { id: "cap-15-sec-03", num: "15.3", title: "15.3 Gateway", status: "planejado" },
+                        { id: "cap-15-sec-04", num: "15.4", title: "15.4 Banco por serviço", status: "planejado" },
+                        { id: "cap-15-sec-05", num: "15.5", title: "15.5 Eventos distribuídos", status: "planejado" },
+                        { id: "cap-15-sec-06", num: "15.6", title: "15.6 Ambiente completo", status: "planejado" },
+                        { id: "cap-15-sec-07", num: "15.7", title: "15.7 Sistema funcionando", status: "planejado" }
+                    ]
+                }
+            ]
+        };
+
+        // Flat array map para navegação sequencial (Anterior / Próximo)
+        const flatPages = [];
+        bookData.inicio.forEach(item => {
+            flatPages.push({ id: item.id, title: item.title, type: 'inicio' });
+        });
+        bookData.chapters.forEach(ch => {
+            ch.items.forEach(sec => {
+                flatPages.push({
+                    id: sec.id,
+                    num: sec.num,
+                    title: sec.title,
+                    chapterNum: ch.chapterNum,
+                    chapterTitle: ch.chapterTitle,
+                    phase: ch.phase,
+                    status: sec.status,
+                    type: 'chapter'
+                });
+            });
+        });
+
+        let currentPageId = 'capa';
+
+        // HELPERS DE STATUS VISUAL
+        function getStatusBadge(status) {
+            switch(status) {
+                case 'concluido':
+                    return `<span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>`;
+                case 'andamento':
+                    return `<span class="status-badge andamento"><span class="status-dot andamento"></span> ● Em andamento</span>`;
+                case 'proximo':
+                    return `<span class="status-badge proximo"><span class="status-dot proximo"></span> ○ Próximo</span>`;
+                default:
+                    return `<span class="status-badge planejado"><span class="status-dot planejado"></span> ○ A construir</span>`;
+            }
+        }
+
+        function getStatusLabel(status) {
+            switch(status) {
+                case 'concluido': return 'Concluído';
+                case 'andamento': return 'Em andamento';
+                case 'proximo': return 'Próximo';
+                default: return 'A construir';
+            }
+        }
+
+        // LÓGICA DE INICIALIZAÇÃO
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar();
+            renderRoadmapChapters();
+            setupPlaceholders();
+            updateStats();
+
+            // Roteamento inicial por Hash
+            const hash = window.location.hash.substring(1);
+            if (hash === 'indice') {
+                navigateTo('sumario-mestre');
+            } else if (hash && flatPages.find(p => p.id === hash)) {
+                navigateTo(hash);
+            } else {
+                navigateTo('capa');
+            }
+
+            // Eventos Mobile
+            document.getElementById('mobileToggle').addEventListener('click', toggleMobileMenu);
+            document.getElementById('sidebarOverlay').addEventListener('click', toggleMobileMenu);
+
+            // Suporte ao botão voltar/avançar do navegador
+            window.addEventListener('hashchange', () => {
+                const currentHash = window.location.hash.substring(1);
+                if (currentHash === 'indice') {
+                    navigateTo('sumario-mestre');
+                } else if (currentHash && currentHash !== currentPageId && flatPages.find(p => p.id === currentHash)) {
+                    navigateTo(currentHash);
+                }
+            });
+        });
+
+        // RENDERIZAÇÃO DO MENU LATERAL COM ACCORDION
+        function renderSidebar() {
+            const navContainer = document.getElementById('sidebarNav');
+            let html = '';
+
+            // Bloco Início
+            html += `<div class="nav-section">`;
+            html += `<div class="nav-section-title">Início</div>`;
+            bookData.inicio.forEach(item => {
+                html += `<a href="#${item.id}" class="nav-link" id="nav-${item.id}" onclick="navigateTo('${item.id}')">${item.title}</a>`;
+            });
+            html += `</div>`;
+
+            // Bloco Capítulos da Construção
+            html += `<div class="nav-section">`;
+            html += `<div class="nav-section-title" style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>Construção</span>
+                        <span style="font-size:0.7rem; color:#94a3b8; font-weight:normal;">15 Capítulos</span>
+                     </div>`;
+
+            bookData.chapters.forEach(ch => {
+                const total = ch.items.length;
+                const done = ch.items.filter(i => i.status === 'concluido').length;
+                const inProg = ch.items.filter(i => i.status === 'andamento').length;
+
+                let chDotClass = 'planejado';
+                let chDotSymbol = '○';
+                if (done === total) {
+                    chDotClass = 'concluido';
+                    chDotSymbol = '✓';
+                } else if (done > 0 || inProg > 0) {
+                    chDotClass = 'andamento';
+                    chDotSymbol = '●';
+                }
+
+                html += `
+                <div class="sidebar-chapter-group" id="chapter-group-${ch.chapterNum}">
+                    <div class="sidebar-chapter-header" id="header-ch-${ch.chapterNum}" onclick="toggleChapterSidebar(${ch.chapterNum})">
+                        <div style="display:flex; align-items:center; gap:0.5rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                            <span class="status-dot ${chDotClass}"></span>
+                            <span style="font-size:0.82rem;">Cap. ${ch.chapterNum}: ${ch.chapterTitle}</span>
+                        </div>
+                        <span class="chevron" id="chevron-ch-${ch.chapterNum}">▶</span>
+                    </div>
+                    <div class="sidebar-subnav" id="subnav-ch-${ch.chapterNum}">
+                `;
+
+                ch.items.forEach(item => {
+                    html += `
+                        <a href="#${item.id}" class="nav-link" id="nav-${item.id}" onclick="navigateTo('${item.id}')">
+                            <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.title}</span>
+                            <span class="status-dot ${item.status}" title="${getStatusLabel(item.status)}"></span>
+                        </a>
+                    `;
+                });
+
+                html += `
+                    </div>
+                </div>
+                `;
+            });
+
+            html += `</div>`;
+            navContainer.innerHTML = html;
+        }
+
+        // TOGGLE DO ACCORDION DA SIDEBAR
+        function toggleChapterSidebar(chNum) {
+            const header = document.getElementById(`header-ch-${chNum}`);
+            const subnav = document.getElementById(`subnav-ch-${chNum}`);
+            const isOpen = header.classList.contains('open');
+
+            if (isOpen) {
+                header.classList.remove('open');
+                subnav.classList.remove('show');
+            } else {
+                header.classList.add('open');
+                subnav.classList.add('show');
+            }
+        }
+
+        // GARANTE QUE O CAPÍTULO ESPECÍFICO ESTEJA EXPANDIDO
+        function openChapterAccordion(chNum) {
+            const header = document.getElementById(`header-ch-${chNum}`);
+            const subnav = document.getElementById(`subnav-ch-${chNum}`);
+            if (header && subnav) {
+                header.classList.add('open');
+                subnav.classList.add('show');
+            }
+        }
+
+        // RENDERIZAÇÃO DO ROADMAP NO SUMÁRIO MESTRE
+        function renderRoadmapChapters() {
+            const container = document.getElementById('roadmapChaptersContainer');
+            if (!container) return;
+
+            let html = '';
+
+            bookData.chapters.forEach(ch => {
+                const total = ch.items.length;
+                const done = ch.items.filter(i => i.status === 'concluido').length;
+                const inProg = ch.items.filter(i => i.status === 'andamento').length;
+
+                let badge = `<span class="status-badge planejado">○ A construir</span>`;
+                if (done === total) {
+                    badge = `<span class="status-badge concluido">✓ 100% Concluído</span>`;
+                } else if (done > 0 || inProg > 0) {
+                    badge = `<span class="status-badge andamento">● ${done}/${total} Concluídas</span>`;
+                }
+
+                html += `
+                <div class="roadmap-chapter-card">
+                    <div class="roadmap-chapter-header" onclick="toggleChapterSidebar(${ch.chapterNum})">
+                        <div class="roadmap-chapter-title">
+                            <span class="roadmap-chapter-num">CAPÍTULO ${ch.chapterNum}</span>
+                            <span>${ch.chapterTitle}</span>
+                            <span style="font-size:0.75rem; color:var(--text-light); font-weight:normal; background:var(--bg-color); padding:0.15rem 0.5rem; border-radius:4px; border:1px solid var(--border);">${ch.phase}</span>
+                        </div>
+                        <div>${badge}</div>
+                    </div>
+                    <div class="roadmap-sections-grid">
+                `;
+
+                ch.items.forEach(sec => {
+                    html += `
+                        <a href="#${sec.id}" class="roadmap-section-link" onclick="navigateTo('${sec.id}')">
+                            <span class="sec-title">
+                                <span class="status-dot ${sec.status}"></span>
+                                <span>${sec.title}</span>
+                            </span>
+                            ${getStatusBadge(sec.status)}
+                        </a>
+                    `;
+                });
+
+                html += `
+                    </div>
+                </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // CRIAÇÃO DINÂMICA DE PÁGINAS PLACEHOLDERS (Para etapas ainda a construir)
+        function setupPlaceholders() {
+            const contentArea = document.getElementById('contentArea');
+            const footerNav = document.getElementById('footerNav');
+
+            bookData.chapters.forEach(ch => {
+                ch.items.forEach(sec => {
+                    if (!document.getElementById(sec.id)) {
+                        const article = document.createElement('article');
+                        article.className = 'page-section';
+                        article.id = sec.id;
+
+                        article.innerHTML = `
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                                <div>
+                                    <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO ${ch.chapterNum} • ${ch.chapterTitle.toUpperCase()}</span>
+                                    <h2 style="margin:0.25rem 0 0 0;">${sec.title}</h2>
+                                </div>
+                                ${getStatusBadge(sec.status)}
+                            </div>
+
+                            <div class="construction-hero-banner ${sec.status === 'andamento' ? 'in-progress' : ''}">
+                                <div class="construction-hero-icon">🚧</div>
+                                <div class="construction-hero-text">
+                                    <h4>Construção Viva: Passo a Passo com o Código</h4>
+                                    <p>Esta seção será documentada em tempo real conforme implementarmos e validarmos o código correspondente no projeto prático.</p>
+                                </div>
+                            </div>
+
+                            <div class="arch-card">
+                                <h4>O que será construído nesta etapa?</h4>
+                                <div class="arch-title">${sec.title} (${ch.chapterTitle})</div>
+                                <div class="arch-item"><span class="arch-label">Papel na Metáfora da Casa:</span> Esta etapa pertence à fase de <strong>${ch.phase}</strong> do sistema.</div>
+                                <div class="arch-item"><span class="arch-label">Regra de Ouro:</span> Não inventamos código antes de entender o problema e validar a implementação com testes reais.</div>
+                            </div>
+
+                            <div class="learning-box">
+                                <h4>Fluxo Metodológico</h4>
+                                <p style="margin:0; font-size: 0.9rem;">CONSTRUIR → ENTENDER → VALIDAR → DOCUMENTAR → TRANSFORMAR EM CAPÍTULO → CONTINUAR</p>
+                            </div>
+
+                            <div class="section-nav-flow">
+                                <a href="#sumario-mestre" onclick="navigateTo('sumario-mestre')">← Voltar ao Sumário Mestre</a>
+                                <span style="font-size:0.8rem; color:var(--text-light);">Fase: ${ch.phase}</span>
+                            </div>
+                        `;
+
+                        contentArea.insertBefore(article, footerNav);
+                    }
+                });
+            });
+        }
+
+        // CÁLCULO E ATUALIZAÇÃO DINÂMICA DAS ESTATÍSTICAS DO SUMÁRIO
+        function updateStats() {
+            let total = 0;
+            let done = 0;
+            let inProgress = 0;
+            let next = 0;
+            let planned = 0;
+
+            bookData.chapters.forEach(ch => {
+                ch.items.forEach(sec => {
+                    total++;
+                    if (sec.status === 'concluido') done++;
+                    else if (sec.status === 'andamento') inProgress++;
+                    else if (sec.status === 'proximo') next++;
+                    else planned++;
+                });
+            });
+
+            const statTotal = document.getElementById('statTotalSteps');
+            const statDone = document.getElementById('statCompletedSteps');
+            const statInProg = document.getElementById('statInProgressSteps');
+            const statNext = document.getElementById('statNextSteps');
+            const statPlanned = document.getElementById('statPlannedSteps');
+
+            if (statTotal) statTotal.innerText = total;
+            if (statDone) statDone.innerText = done;
+            if (statInProg) statInProg.innerText = inProgress;
+            if (statNext) statNext.innerText = next;
+            if (statPlanned) statPlanned.innerText = planned;
+        }
+
+        // NAVEGAÇÃO CENTRALIZADA
+        function navigateTo(pageId) {
+            if (pageId === 'indice') pageId = 'sumario-mestre';
+
+            // Atualiza Hash
+            window.location.hash = pageId;
+            currentPageId = pageId;
+
+            // Oculta todas as seções
+            document.querySelectorAll('.page-section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+
+            // Exibe a selecionada
+            const target = document.getElementById(pageId);
+            if (target) {
+                target.classList.add('active');
+            } else {
+                console.warn(`Seção '${pageId}' não encontrada no DOM.`);
+            }
+
+            // Atualiza active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            const activeNav = document.getElementById(`nav-${pageId}`);
+            if (activeNav) activeNav.classList.add('active');
+
+            // Atualiza status do accordion na sidebar
+            document.querySelectorAll('.sidebar-chapter-header').forEach(h => {
+                h.classList.remove('active-chapter');
+            });
+
+            // Atualiza Breadcrumbs e abre accordion correspondente
+            const currentItem = flatPages.find(p => p.id === pageId);
+            if (currentItem) {
+                if (currentItem.type === 'chapter') {
+                    document.getElementById('breadcrumbs').innerHTML = 
+                        `Livro Vivo / Cap. ${currentItem.chapterNum}: ${currentItem.chapterTitle} / <span>${currentItem.title}</span>`;
+                    
+                    // Abre o accordion do capítulo ativo
+                    openChapterAccordion(currentItem.chapterNum);
+                    const chHeader = document.getElementById(`header-ch-${currentItem.chapterNum}`);
+                    if (chHeader) chHeader.classList.add('active-chapter');
+                } else {
+                    document.getElementById('breadcrumbs').innerHTML = 
+                        `Livro Vivo / <span>${currentItem.title}</span>`;
+                }
+            }
+
+            // Atualiza botões do rodapé (Anterior / Próximo)
+            updateFooterNav();
+
+            // Scroll para o topo
+            document.getElementById('contentArea').scrollTop = 0;
+
+            // Fecha sidebar no mobile
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar.classList.contains('open')) {
+                toggleMobileMenu();
+            }
+        }
+
+        // ATUALIZAÇÃO DOS BOTÕES ANTERIOR / PRÓXIMO
+        function updateFooterNav() {
+            const currentIndex = flatPages.findIndex(p => p.id === currentPageId);
+            const footer = document.getElementById('footerNav');
+            let html = '';
+
+            if (currentIndex > 0) {
+                const prev = flatPages[currentIndex - 1];
+                html += `<a href="#${prev.id}" class="footer-btn prev" onclick="navigateTo('${prev.id}')">
+                            <span>Anterior</span>
+                            <strong>← ${prev.title}</strong>
+                         </a>`;
+            } else {
+                html += `<div></div>`;
+            }
+
+            if (currentIndex < flatPages.length - 1) {
+                const next = flatPages[currentIndex + 1];
+                html += `<a href="#${next.id}" class="footer-btn next" onclick="navigateTo('${next.id}')">
+                            <span>Próximo</span>
+                            <strong>${next.title} →</strong>
+                         </a>`;
+            }
+
+            footer.innerHTML = html;
+        }
+
+        // TOGGLE DO MENU MOBILE
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const toggleBtn = document.getElementById('mobileToggle');
+            
+            const isOpen = sidebar.classList.contains('open');
+            
+            if (isOpen) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('open');
+                toggleBtn.setAttribute('aria-expanded', 'false');
+            } else {
+                sidebar.classList.add('open');
+                overlay.classList.add('open');
+                toggleBtn.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        // COPIAR CÓDIGO
+        function copyCode(btnElement) {
+            const preElement = btnElement.parentElement.nextElementSibling;
+            const codeText = preElement.innerText;
+            
+            navigator.clipboard.writeText(codeText).then(() => {
+                const originalText = btnElement.innerText;
+                btnElement.innerText = 'Copiado!';
+                btnElement.style.background = 'var(--primary)';
+                
+                setTimeout(() => {
+                    btnElement.innerText = originalText;
+                    btnElement.style.background = 'rgba(255,255,255,0.1)';
+                }, 2000);
+            }).catch(err => {
+                console.error('Falha ao copiar:', err);
+            });
+        }
+    </script>
+</body>
+</html>
