@@ -2845,7 +2845,7 @@ public void UpdatePrice_WithNegativePrice_ThrowsArgumentOutOfRangeException()
                     <div class="mental-flow-strip" style="margin-top:1rem;">
                         <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">Capítulo 2: Domínio Concluído ✅</span>
                         <span class="flow-arrow">→</span>
-                        <span class="flow-step" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">Capítulo 3: 3.1 Criando o projeto Application ⬅️ PRÓXIMO</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">Capítulo 3: Aplicação (3.1 a 3.4 Concluídos) ✅</span>
                     </div>
                 </div>
 
@@ -2860,7 +2860,7 @@ public void UpdatePrice_WithNegativePrice_ThrowsArgumentOutOfRangeException()
             </article>
 
             <!-- ==========================================
-                 CAPÍTULO 3: APLICAÇÃO (PRÓXIMA FASE)
+                 CAPÍTULO 3: APLICAÇÃO (EM ANDAMENTO)
                  ========================================== -->
             <article class="page-section" id="cap-03-sec-01">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
@@ -2868,16 +2868,16 @@ public void UpdatePrice_WithNegativePrice_ThrowsArgumentOutOfRangeException()
                         <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 3 • APLICAÇÃO</span>
                         <h2 style="margin:0.25rem 0 0 0;">3.1 Criando o projeto Application</h2>
                     </div>
-                    <span class="status-badge proximo"><span class="status-dot proximo"></span> ○ Próximo</span>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
                 </div>
 
                 <div class="learning-box">
-                    <h4>Próxima Etapa da Construção</h4>
-                    <p style="margin:0; font-size: 0.95rem;">Criação da camada de orquestração de casos de uso do microsserviço Catalog, intermediando a API e o Domínio através de DTOs, handlers e validações.</p>
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Criação da camada de orquestração de casos de uso do microsserviço Catalog, intermediando a API e o Domínio através de contratos, DTOs e validações, com isolamento de responsabilidades.</p>
                 </div>
 
-                <h3>O QUE SERÁ CONSTRUÍDO?</h3>
-                <p>Criaremos o projeto <code>Catalog.Application.csproj</code>. Ele possuirá apenas uma dependência interna: uma referência de projeto direta para <code>Catalog.Domain</code>.</p>
+                <h3>O QUE FIZEMOS?</h3>
+                <p>Criamos o projeto <code>Catalog.Application.csproj</code> como uma Class Library .NET 10. Ele possui apenas uma única dependência interna de projeto: uma referência direta para <code>Catalog.Domain</code>.</p>
 
                 <div class="code-container">
                     <div class="code-header">
@@ -2899,11 +2899,606 @@ public void UpdatePrice_WithNegativePrice_ThrowsArgumentOutOfRangeException()
 &lt;/Project&gt;</code></pre>
                 </div>
 
-                <p>Aqui ficarão os comandos, consultas, DTOs e validações da aplicação, sem poluir a API com lógica de orquestração.</p>
+                <div class="arch-card">
+                    <h4>Decisão Arquitetural</h4>
+                    <div class="arch-title">Fronteira Limpa da Aplicação</div>
+                    <div class="arch-item"><span class="arch-label">Papel da Camada:</span> A Application orquestra casos de uso, transformando dados de entrada em comandos de domínio e convertendo resultados em saídas limpas.</div>
+                    <div class="arch-item"><span class="arch-label">Independência:</span> Não referencia pacotes web (ASP.NET Core / MVC) nem provedores de banco de dados (EF Core / Dapper / Npgsql).</div>
+                </div>
 
                 <div class="section-nav-flow">
                     <a href="#cap-02-sec-08" onclick="navigateTo('cap-02-sec-08')">← Anterior: 2.8 Testando o domínio</a>
                     <a href="#cap-03-sec-02" onclick="navigateTo('cap-03-sec-02')">Próximo: 3.2 Casos de uso →</a>
+                </div>
+            </article>
+
+            <!-- 3.2 CASOS DE USO -->
+            <article class="page-section" id="cap-03-sec-02">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 3 • APLICAÇÃO</span>
+                        <h2 style="margin:0.25rem 0 0 0;">3.2 Casos de uso</h2>
+                    </div>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Modelagem e estruturação do primeiro caso de uso da aplicação (<code>CreateProduct</code>), adotando o padrão de organização coesa por funcionalidade (Vertical Slice / Feature Folders).</p>
+                </div>
+
+                <h3>O QUE É UM CASO DE USO?</h3>
+                <p>Na Clean Architecture e no DDD, um <strong>Caso de Uso</strong> representa uma intenção concreta do usuário ou de outro sistema sobre a nossa aplicação (por exemplo: <em>Cadastrar um novo produto no catálogo</em>).</p>
+                <p>O caso de uso atua como maestro:</p>
+                <ul>
+                    <li>Recebe os dados brutos necessários para a operação via contrato formal de entrada.</li>
+                    <li>Valida a consistência operacional da requisição.</li>
+                    <li>Coordena as entidades e regras puras do Domínio.</li>
+                    <li>Delega a persistência para a Infraestrutura (via abstrações).</li>
+                    <li>Devolve uma resposta previsível e formatada para o chamador.</li>
+                </ul>
+
+                <h3>ORGANIZAÇÃO POR PASTAS: COESÃO VERTICAL</h3>
+                <p>Em arquiteturas tradicionais em camadas horizontais, os desenvolvedores frequentemente espalham arquivos em pastas genéricas como <code>DTOs/</code>, <code>Services/</code>, <code>Interfaces/</code>. Conforme a aplicação cresce, navegar entre esses arquivos torna-se fragmentado e custoso.</p>
+                <p>Adotamos o princípio de agrupamento por <strong>Caso de Uso</strong> dentro da entidade agregada correspondente:</p>
+
+                <div class="diagram-container" style="background:#ffffff; margin:0.5rem 0; padding:1rem;">
+                    <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.6; color:var(--text-heading);">
+Catalog.Application
+└── Products
+    └── CreateProduct
+        ├── CreateProductRequest.cs
+        └── CreateProductResponse.cs
+                    </pre>
+                </div>
+
+                <div class="arch-card">
+                    <h4>Decisão Arquitetural</h4>
+                    <div class="arch-title">Feature Folders e Coesão Espacial</div>
+                    <div class="arch-item"><span class="arch-label">Vantagem:</span> Tudo o que é necessário para entender, manter, testar ou refatorar a criação de produtos reside em uma única pasta isolada (<code>CreateProduct</code>).</div>
+                    <div class="arch-item"><span class="arch-label">Baixo Acoplamento:</span> A evolução de um caso de uso não impacta contratos ou lógicas de outros fluxos da aplicação.</div>
+                </div>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-03-sec-01" onclick="navigateTo('cap-03-sec-01')">← Anterior: 3.1 Criando o projeto Application</a>
+                    <a href="#cap-03-sec-03" onclick="navigateTo('cap-03-sec-03')">Próximo: 3.3 Request →</a>
+                </div>
+            </article>
+
+            <!-- 3.3 REQUEST -->
+            <article class="page-section" id="cap-03-sec-03">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 3 • APLICAÇÃO</span>
+                        <h2 style="margin:0.25rem 0 0 0;">3.3 Request</h2>
+                    </div>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Construção do contrato formal de entrada para o caso de uso de criação de produtos: <code>CreateProductRequest</code>.</p>
+                </div>
+
+                <h3>O CONTRATO DE ENTRADA DO CASO DE USO</h3>
+                <p>O <strong>Request</strong> representa o contrato de transporte que reúne exclusivamente os dados necessários enviados pelo consumidor externo (como a Minimal API) para dar início à execução da operação.</p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.Application/Products/CreateProduct/CreateProductRequest.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>namespace Catalog.Application.Products.CreateProduct;
+
+public record CreateProductRequest(
+    string Name,
+    string Description,
+    decimal Price,
+    string PictureFileName,
+    int CatalogTypeId,
+    int CatalogBrandId);</code></pre>
+                </div>
+
+                <div class="arch-card">
+                    <h4>Decisão Arquitetural</h4>
+                    <div class="arch-title">Por que usar Record e Contrato Explícito?</div>
+                    <div class="arch-item"><span class="arch-label">Imutabilidade:</span> DTOs de transporte não devem ter seu estado alterado inadvertidamente durante a passagem pelas camadas. Records em C# oferecem imutabilidade posicional elegante e semântica de igualdade por valor.</div>
+                    <div class="arch-item"><span class="arch-label">Não receber Entidade de Domínio:</span> A API externa nunca envia uma instância de <code>Product</code>. A entidade possui invariantes e construtores protegidos. O Request atua como fronteira segura de transporte.</div>
+                </div>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-03-sec-02" onclick="navigateTo('cap-03-sec-02')">← Anterior: 3.2 Casos de uso</a>
+                    <a href="#cap-03-sec-04" onclick="navigateTo('cap-03-sec-04')">Próximo: 3.4 Response →</a>
+                </div>
+            </article>
+
+            <!-- 3.4 RESPONSE -->
+            <article class="page-section" id="cap-03-sec-04">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 3 • APLICAÇÃO</span>
+                        <h2 style="margin:0.25rem 0 0 0;">3.4 Response</h2>
+                    </div>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Criação do contrato de saída formal do caso de uso de criação de produtos: <code>CreateProductResponse</code>, estabelecendo a fronteira desacoplada entre a execução da aplicação e seus consumidores.</p>
+                </div>
+
+                <h3>O PAPEL DO RESPONSE NA APLICAÇÃO</h3>
+                <p>O <strong>Response</strong> representa os dados que o caso de uso disponibiliza como resultado de sua execução. Ele define a interface pública daquilo que a operação completou com sucesso, servindo de resposta clara, previsível e tipada para o consumidor (como a API HTTP, um consumidor gRPC ou um worker de mensageria).</p>
+
+                <h3>LOCALIZAÇÃO NA ESTRUTURA DO PROJETO</h3>
+                <p>Mantendo o padrão de organização coesa em <em>Feature Folders</em>, os contratos de entrada e saída convivem na mesma pasta do caso de uso:</p>
+
+                <div class="diagram-container" style="background:#ffffff; margin:0.5rem 0; padding:1rem;">
+                    <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.6; color:var(--text-heading);">
+Catalog.Application
+└── Products
+    └── CreateProduct
+        ├── CreateProductRequest.cs
+        └── CreateProductResponse.cs
+                    </pre>
+                </div>
+
+                <h3>CÓDIGO IMPLEMENTADO</h3>
+                <p>O contrato de saída é implementado como um <code>record</code> imutável em C#, contendo a projeção do produto recém-criado:</p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.Application/Products/CreateProduct/CreateProductResponse.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>public record CreateProductResponse(
+    int Id,
+    string Name,
+    string Description,
+    decimal Price,
+    string PictureFileName,
+    int CatalogTypeId,
+    int CatalogBrandId);</code></pre>
+                </div>
+
+                <h3>DIFERENÇA FUNDAMENTAL: DOMAIN VS APPLICATION</h3>
+                <p>É crucial diferenciar a responsabilidade de cada tipo na arquitetura:</p>
+
+                <div class="arch-card" style="border-left-color: #2563eb;">
+                    <div class="arch-title">Product (Domain) vs CreateProductResponse (Application)</div>
+                    <div class="arch-item">
+                        <span class="arch-label">Product (Entidade do Domain):</span>
+                        Possui ciclo de vida contínuo, identidade única, métodos de negócio, comportamento e proteção de invariantes de integridade. Vive no coração do negócio e nunca deve depender de camadas externas.
+                    </div>
+                    <div class="arch-item">
+                        <span class="arch-label">CreateProductResponse (Contrato da Application):</span>
+                        É um DTO (Data Transfer Object) anêmico e imutável. Não possui lógica nem regras de negócio: é exclusivamente uma projeção de dados para satisfazer o consumidor da operação.
+                    </div>
+                </div>
+
+                <h3>FLUXO DO CASO DE USO</h3>
+                <p>Com o Request e o Response formalizados, o fluxo de execução do caso de uso fecha seu ciclo de dados:</p>
+
+                <div class="visual-flow" style="margin:1.5rem 0;" aria-label="Fluxo do caso de uso CreateProduct">
+                    <div style="background:#eff6ff; border:1px solid var(--primary); padding:0.5rem 1.5rem; border-radius:6px; font-weight:600; color:var(--primary);">
+                        CreateProductRequest
+                        <div style="font-size:0.75rem; font-weight:normal; color:var(--text-light); margin-top:0.2rem;">Dados necessários de entrada</div>
+                    </div>
+                    <div class="arrow" style="font-size:1.5rem; color:var(--primary); font-weight:bold;">↓</div>
+                    <div style="background:#f8fafc; border:2px solid var(--sidebar-active); padding:0.6rem 2rem; border-radius:6px; font-weight:700; color:var(--text-heading);">
+                        CreateProduct
+                        <div style="font-size:0.75rem; font-weight:normal; color:var(--text-light); margin-top:0.2rem;">Execução da operação / Orquestração</div>
+                    </div>
+                    <div class="arrow" style="font-size:1.5rem; color:var(--primary); font-weight:bold;">↓</div>
+                    <div style="background:#ecfdf5; border:1px solid #10b981; padding:0.5rem 1.5rem; border-radius:6px; font-weight:600; color:#065f46;">
+                        CreateProductResponse
+                        <div style="font-size:0.75rem; font-weight:normal; color:#047857; margin-top:0.2rem;">Resultado necessário disponibilizado</div>
+                    </div>
+                </div>
+
+                <div class="arch-card">
+                    <h4>Registro de Decisão Arquitetural</h4>
+                    <div class="arch-title">Não Retornar Diretamente a Entidade Product</div>
+                    <div class="arch-item">
+                        <span class="arch-label">Decisão:</span>
+                        A camada de Application <strong>não deve</strong> retornar a entidade <code>Product</code> diretamente como contrato de suas operações.
+                    </div>
+                    <div class="arch-item">
+                        <span class="arch-label">Por quê?</span>
+                        A entidade pertence ao <strong>Domain</strong> e tem autonomia para evoluir de acordo com as necessidades estritas das regras de negócio (novos métodos de domínio, alterações em campos internos, reestruturação de invariantes). Se retornássemos a entidade diretamente, qualquer alteração interna no modelo quebraria os contratos expostos aos consumidores externos.
+                    </div>
+                    <div class="arch-item">
+                        <span class="arch-label">Papel do Response:</span>
+                        O <code>Response</code> representa cirurgicamente aquilo que a operação precisa devolver para o seu consumidor, blindando o domínio contra vazamentos e acoplamento indevido.
+                    </div>
+                </div>
+
+                <div class="arch-card" style="border-left-color: #f59e0b;">
+                    <h4>Registro de Decisão Arquitetural</h4>
+                    <div class="arch-title">O Identificador (Id) e o Mecanismo de Persistência</div>
+                    <div class="arch-item">
+                        <span class="arch-label">Estado Atual:</span>
+                        A entidade <code>Product</code> possui um <code>Id</code> do tipo inteiro (<code>int</code>).
+                    </div>
+                    <div class="arch-item">
+                        <span class="arch-label">Sem Antecipação Prematura:</span>
+                        Neste momento, o <code>Id</code> <strong>ainda não possui mecanismo de geração ou persistência definido</strong> (seja via sequência no PostgreSQL, Identity no SQL Server ou geração programática).
+                    </div>
+                    <div class="arch-item">
+                        <span class="arch-label">Responsabilidade da Infraestrutura:</span>
+                        A definição de como o identificador será persistido e gerado será tratada posteriormente na camada de <strong>Infrastructure</strong>.
+                    </div>
+                    <div class="arch-item">
+                        <span class="arch-label">Regra de Ouro:</span>
+                        <strong>Não antecipamos Entity Framework Core, Dapper ou banco de dados nesta etapa.</strong> A camada de Application concentra-se puramente na orquestração e em seus contratos, sem contaminar a modelagem com detalhes de bancos.
+                    </div>
+                </div>
+
+                <div class="learning-box" style="border-left-color: #10b981; background: #f0fdf4;">
+                    <h4 style="color: #065f46;">📐 Princípio Reutilizável de Engenharia</h4>
+                    <p style="margin:0 0 0.5rem 0; font-size: 0.95rem; line-height: 1.6;">
+                        Para qualquer caso de uso de software que necessite de entrada e produza saída, siga o fluxo de raciocínio sistemático:
+                    </p>
+                    <div class="diagram-container" style="background:#ffffff; margin:0.5rem 0; padding:0.75rem 1rem;">
+                        <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.6; color:var(--text-heading);">
+CASO DE USO
+    ↓
+identificar dados necessários de entrada
+    ↓
+Request
+    ↓
+executar caso de uso
+    ↓
+identificar resultado necessário
+    ↓
+Response
+                        </pre>
+                    </div>
+                    <p style="margin:0.75rem 0 0 0; font-size: 0.9rem; line-height: 1.6; color: #166534;">
+                        <strong>Sem dogmas:</strong> Request e Response <strong>não são obrigatórios por dogma</strong> para absolutamente todos os casos de uso. Eles devem existir quando representarem contratos úteis para a operação. Casos de uso de simples consulta direta, comandos que apenas alteram estado sem retorno de dados ou tarefas com parâmetros únicos podem não exigir a criação burocrática de ambos. A necessidade real orienta a arquitetura, nunca a imposição cega.
+                    </p>
+                </div>
+
+                <div class="methodology-box" style="margin-top:1.5rem;">
+                    <h3>🧱 Progresso da Construção — Aplicação em Andamento</h3>
+                    <p style="margin-bottom:0.5rem; font-size:0.9rem; color:var(--text-light);"><strong>MAPA DE EVOLUÇÃO DAS CAMADAS</strong></p>
+                    <div class="diagram-container" style="background:#ffffff; margin:0.5rem 0; padding:1rem;">
+                        <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.6; color:var(--text-heading);">
+CAPÍTULO 2 → DOMÍNIO
+2.1 ✅
+2.2 ✅
+2.3 ✅
+2.4 ✅
+2.5 ✅
+2.6 ✅
+2.7 ✅
+2.8 ✅
+
+CAPÍTULO 3 → APLICAÇÃO
+3.1 Criando o projeto Application  ✅
+3.2 Casos de uso                 ✅
+3.3 Request                      ✅
+3.4 Response                     ✅
+3.5 Service                      ⬅️ PRÓXIMO
+3.6 Handler
+3.7 Validação
+3.8 Tratamento de erros
+3.9 Testando os casos de uso
+                        </pre>
+                    </div>
+                    <div class="mental-flow-strip" style="margin-top:1rem;">
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">Capítulo 2: Domínio ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:600;">3.1 Application ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:600;">3.2 Casos de uso ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:600;">3.3 Request ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">3.4 Response ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">3.5 Service ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">3.6 Handler ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">3.7 Validação ⬅️ PRÓXIMO</span>
+                    </div>
+                </div>
+
+                <h3>GANCHO PARA O PRÓXIMO PASSO</h3>
+                <p>Com os contratos de entrada (<code>CreateProductRequest</code>) e de saída (<code>CreateProductResponse</code>) definidos, a fronteira do caso de uso está estabelecida. O próximo passo de engenharia é construir a orquestração que receberá o Request, manipulará as entidades de domínio e produzirá o Response: <strong>3.5 Service</strong>.</p>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-03-sec-03" onclick="navigateTo('cap-03-sec-03')">← Anterior: 3.3 Request</a>
+                    <a href="#cap-03-sec-05" onclick="navigateTo('cap-03-sec-05')">Próximo: 3.5 Service →</a>
+                </div>
+            </article>
+
+            <!-- 3.5 SERVICE -->
+            <article class="page-section" id="cap-03-sec-05">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 3 • APLICAÇÃO</span>
+                        <h2 style="margin:0.25rem 0 0 0;">3.5 Service</h2>
+                    </div>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Construção do serviço de aplicação <code>CreateProductService</code>, responsável por orquestrar a execução do caso de uso, instanciando a entidade rica <code>Product</code> do Domínio e projetando o resultado no contrato de saída.</p>
+                </div>
+
+                <h3>O PAPEL DO APPLICATION SERVICE</h3>
+                <p>O <strong>Application Service</strong> atua como o maestro da operação de negócio. Ele não implementa regras de validação intrínsecas (essas pertencem exclusivamente às entidades do <code>Catalog.Domain</code>), mas é encarregado de conduzir o fluxo sequencial do caso de uso:</p>
+                <ul>
+                    <li>Receber o contrato de entrada (<code>CreateProductRequest</code>).</li>
+                    <li>Instanciar a entidade rica <code>Product</code>, disparando suas invariantes de integridade e regras de negócio.</li>
+                    <li>Projetar e devolver os dados resultantes encapsulados no <code>CreateProductResponse</code>.</li>
+                </ul>
+
+                <h3>CÓDIGO IMPLEMENTADO</h3>
+                <p>O serviço reside diretamente na pasta da funcionalidade (<em>Feature Folder</em>) <code>Products/CreateProduct</code>:</p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.Application/Products/CreateProduct/CreateProductService.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>using Catalog.Domain.Entities;
+
+namespace Catalog.Application.Products.CreateProduct;
+
+public class CreateProductService
+{
+    public CreateProductResponse CreateProduct(CreateProductRequest request)
+    {
+        var product = new Product(
+            Guid.NewGuid(),
+            request.Name,
+            request.Description,
+            request.Price,
+            request.PictureFileName,
+            request.CatalogTypeId,
+            request.CatalogBrandId);
+
+        return new CreateProductResponse(
+            product.Id,
+            product.Name,
+            product.Description,
+            product.Price,
+            product.PictureFileName,
+            product.CatalogTypeId,
+            product.CatalogBrandId);
+    }
+}</code></pre>
+                </div>
+
+                <div class="arch-card">
+                    <h4>Decisão Arquitetural</h4>
+                    <div class="arch-title">Orquestração Pura Sem Poluição de Regras</div>
+                    <div class="arch-item"><span class="arch-label">Responsabilidade Coesa:</span> O <code>CreateProductService</code> sabe <em>como coordenar o fluxo</em>, mas não decide regras como preço mínimo ou tamanho de descrição — essa integridade é auto-protegida pelo <code>Product</code>.</div>
+                    <div class="arch-item"><span class="arch-label">Evolução do Design:</span> Para desacoplar a camada de entrega da chamada direta ao serviço e introduzir uma abordagem orientada a intenções explícitas, o caso de uso avança para a separação de <strong>Command</strong> e <strong>Handler</strong>.</div>
+                </div>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-03-sec-04" onclick="navigateTo('cap-03-sec-04')">← Anterior: 3.4 Response</a>
+                    <a href="#cap-03-sec-06" onclick="navigateTo('cap-03-sec-06')">Próximo: 3.6 Handler →</a>
+                </div>
+            </article>
+
+            <!-- 3.6 HANDLER -->
+            <article class="page-section" id="cap-03-sec-06">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 3 • APLICAÇÃO</span>
+                        <h2 style="margin:0.25rem 0 0 0;">3.6 Handler</h2>
+                    </div>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Implementação do padrão <strong>Command / Handler</strong> com a criação do <code>CreateProductCommand</code> (representando a ordem/intenção de criação) e do <code>CreateProductCommandHandler</code> (encarregado de tratar a ordem e encaminhá-la ao serviço de aplicação).</p>
+                </div>
+
+                <h3>O QUE FOI CONSTRUÍDO</h3>
+                <p>Consolidamos a estrutura coesa da funcionalidade de cadastro de produtos em <code>Catalog.Application</code> com 5 arquivos especializados:</p>
+
+                <div class="diagram-container" style="background:#ffffff; margin:0.5rem 0; padding:1rem;">
+                    <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.6; color:var(--text-heading);">
+Catalog.Application
+└── Products
+    └── CreateProduct
+        ├── CreateProductRequest.cs
+        ├── CreateProductResponse.cs
+        ├── CreateProductService.cs
+        ├── CreateProductCommand.cs
+        └── CreateProductCommandHandler.cs
+                    </pre>
+                </div>
+
+                <p>Nesta etapa foram adicionados dois novos componentes fundamentais:</p>
+                <ul>
+                    <li><strong>CreateProductCommand:</strong> Record posicional que representa explicitamente a ordem ou intenção de criar um produto no sistema.</li>
+                    <li><strong>CreateProductCommandHandler:</strong> Classe que recebe e trata o comando, adaptando os parâmetros e delegando a execução orquestrada ao <code>CreateProductService</code>.</li>
+                </ul>
+
+                <h3>CÓDIGOS IMPLEMENTADOS</h3>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.Application/Products/CreateProduct/CreateProductCommand.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>namespace Catalog.Application.Products.CreateProduct;
+
+public record CreateProductCommand(
+    string Name,
+    string Description,
+    decimal Price,
+    string PictureFileName,
+    int CatalogTypeId,
+    int CatalogBrandId);</code></pre>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.Application/Products/CreateProduct/CreateProductCommandHandler.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>namespace Catalog.Application.Products.CreateProduct;
+
+public class CreateProductCommandHandler
+{
+    private readonly CreateProductService _createProductService;
+
+    public CreateProductCommandHandler(CreateProductService createProductService)
+    {
+        _createProductService = createProductService;
+    }
+
+    public CreateProductResponse Handle(CreateProductCommand command)
+    {
+        var request = new CreateProductRequest(
+            Guid.NewGuid(),
+            command.Name,
+            command.Description,
+            command.Price,
+            command.PictureFileName,
+            command.CatalogTypeId,
+            command.CatalogBrandId);
+
+        return _createProductService.CreateProduct(request);
+    }
+}</code></pre>
+                </div>
+
+                <h3>FLUXO CONSTRUÍDO</h3>
+                <p>A execução do caso de uso agora opera através da cadeia explícita de comando, tratamento, orquestração e domínio:</p>
+
+                <div class="visual-flow" style="margin:1.5rem 0;" aria-label="Fluxo completo construído com Command e Handler">
+                    <div style="background:#eff6ff; border:1px solid var(--primary); padding:0.45rem 1.5rem; border-radius:6px; font-weight:600; color:var(--primary);">
+                        CreateProductCommand
+                        <div style="font-size:0.75rem; font-weight:normal; color:var(--text-light); margin-top:0.2rem;">Intenção / Ordem da ação</div>
+                    </div>
+                    <div class="arrow" style="font-size:1.4rem; color:var(--primary); font-weight:bold;">↓</div>
+                    <div style="background:#f8fafc; border:2px solid var(--sidebar-active); padding:0.5rem 1.75rem; border-radius:6px; font-weight:700; color:var(--text-heading);">
+                        CreateProductCommandHandler
+                        <div style="font-size:0.75rem; font-weight:normal; color:var(--text-light); margin-top:0.2rem;">Recebe e trata o Command</div>
+                    </div>
+                    <div class="arrow" style="font-size:1.4rem; color:var(--primary); font-weight:bold;">↓</div>
+                    <div style="background:#eff6ff; border:1px solid #3b82f6; padding:0.45rem 1.5rem; border-radius:6px; font-weight:600; color:#1d4ed8;">
+                        CreateProductService
+                        <div style="font-size:0.75rem; font-weight:normal; color:var(--text-light); margin-top:0.2rem;">Coordena a execução do caso de uso</div>
+                    </div>
+                    <div class="arrow" style="font-size:1.4rem; color:var(--primary); font-weight:bold;">↓</div>
+                    <div style="background:#ecfdf5; border:1px solid #10b981; padding:0.45rem 1.5rem; border-radius:6px; font-weight:600; color:#065f46;">
+                        Product (Domain Entity)
+                        <div style="font-size:0.75rem; font-weight:normal; color:#047857; margin-top:0.2rem;">Protege suas próprias regras de negócio</div>
+                    </div>
+                    <div class="arrow" style="font-size:1.4rem; color:var(--primary); font-weight:bold;">↓</div>
+                    <div style="background:#ecfdf5; border:1px solid #10b981; padding:0.45rem 1.5rem; border-radius:6px; font-weight:700; color:#065f46;">
+                        CreateProductResponse
+                        <div style="font-size:0.75rem; font-weight:normal; color:#047857; margin-top:0.2rem;">Contrato final de saída disponibilizado</div>
+                    </div>
+                </div>
+
+                <div class="arch-card" style="border-left-color: #2563eb;">
+                    <h4>A Analogia Fundamental do Aprendizado</h4>
+                    <div class="arch-title">Papéis e Responsabilidades no Fluxo</div>
+                    <div class="arch-item">
+                        <span class="arch-label">Command:</span> A ordem / intenção explícita de realizar uma ação no sistema.
+                    </div>
+                    <div class="arch-item">
+                        <span class="arch-label">Handler:</span> Quem recebe e trata aquela ordem, servindo de ponto de entrada da intenção.
+                    </div>
+                    <div class="arch-item">
+                        <span class="arch-label">Service:</span> Quem coordena a orquestração do caso de uso.
+                    </div>
+                    <div class="arch-item">
+                        <span class="arch-label">Domain Entity:</span> Quem protege suas próprias regras e invariantes de negócio.
+                    </div>
+                </div>
+
+                <div class="learning-box" style="border-left-color: #f59e0b; background: #fffbeb;">
+                    <h4 style="color: #b45309;">⚠️ Esclarecimento Arquitetural Importante</h4>
+                    <p style="margin:0 0 0.5rem 0; font-size: 0.95rem; line-height: 1.6; color: #78350f;">
+                        <strong>Handler não é um requisito de microsserviços por si só.</strong>
+                    </p>
+                    <p style="margin:0; font-size: 0.9rem; line-height: 1.6; color: #92400e;">
+                        Neste projeto, ele está sendo estudado dentro de uma abordagem arquitetural baseada em <strong>Command/Handler</strong>, que poderá posteriormente ser integrada a um <strong>Mediator</strong> (como o MediatR). O objetivo pedagógico é entender a mecânica da separação de intenção e execução antes de introduzir bibliotecas mágicas.
+                    </p>
+                </div>
+
+                <div class="arch-card" style="border-left-color: #ef4444;">
+                    <h4>O que AINDA NÃO foi implementado</h4>
+                    <div class="arch-title">Fronteiras e Honestidade Técnica da Construção</div>
+                    <div class="arch-item">
+                        <span class="arch-label">Sem Antecipações Prematuras:</span>
+                        Para manter o compromisso de engenharia de só registrar o que realmente foi construído e testado, registramos expressamente que <strong>ainda NÃO foram implementados</strong>:
+                        <ul style="margin:0.5rem 0 0 1.25rem; font-size:0.9rem; line-height:1.6;">
+                            <li><strong>Mediator / MediatR:</strong> Nenhum pacote de mediação ou desacoplamento reflexivo foi adicionado ainda.</li>
+                            <li><strong>CQRS Completo:</strong> Não há separação física de bancos de leitura/escrita nem queries segregadas ainda.</li>
+                            <li><strong>Persistência / Banco de Dados:</strong> O produto ainda não é gravado em nenhum storage permanente.</li>
+                            <li><strong>Repository:</strong> Nenhuma interface de repositório nem implementação de persistência foi criada nesta etapa.</li>
+                            <li><strong>Entity Framework Core:</strong> Nenhum ORM foi referenciado ou configurado no projeto Application.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="arch-card" style="border-left-color: #10b981;">
+                    <h4>Decisão Arquitetural e Aprendizado</h4>
+                    <div class="arch-title">Justificativa por Problema, Não por Moda</div>
+                    <div class="arch-item">
+                        <span class="arch-label">Princípio Fundacional:</span>
+                        <em>"Não devemos criar componentes apenas por padrão. Neste laboratório, Command e Handler estão sendo introduzidos para compreender o fluxo de uma arquitetura baseada em comandos e preparar o terreno para avaliar o uso de Mediator. A adoção de cada tecnologia será justificada pelo problema que ela resolve."</em>
+                    </div>
+                </div>
+
+                <div class="methodology-box" style="margin-top:1.5rem;">
+                    <h3>🧱 Progresso da Construção — Aplicação Consolidada</h3>
+                    <p style="margin-bottom:0.5rem; font-size:0.9rem; color:var(--text-light);"><strong>CAPÍTULO 3 → APLICAÇÃO</strong></p>
+                    <div class="diagram-container" style="background:#ffffff; margin:0.5rem 0; padding:1rem;">
+                        <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.6; color:var(--text-heading);">
+CAPÍTULO 3 → APLICAÇÃO
+
+3.1 Criando o projeto Application  ✅
+3.2 Casos de uso                  ✅
+3.3 Request                       ✅
+3.4 Response                      ✅
+3.5 Service                       ✅
+3.6 Handler                       ✅
+3.7 Validação                     ⬅️ PRÓXIMO
+3.8 Tratamento de erros
+3.9 Testando os casos de uso
+                        </pre>
+                    </div>
+                    <div class="mental-flow-strip" style="margin-top:1rem;">
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">Capítulo 2: Domínio ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:600;">3.1 Application ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:600;">3.2 Casos de uso ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:600;">3.3 Request ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:600;">3.4 Response ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:600;">3.5 Service ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">3.6 Handler ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">3.7 Validação ⬅️ PRÓXIMO</span>
+                    </div>
+                </div>
+
+                <h3>GANCHO PARA O PRÓXIMO PASSO</h3>
+                <p>Com a cadeia de execução (Command → Handler → Service → Entity → Response) devidamente articulada, o próximo passo essencial da engenharia de aplicação é garantir a consistência dos dados que chegam no comando antes de acionar o domínio: <strong>3.7 Validação</strong>.</p>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-03-sec-05" onclick="navigateTo('cap-03-sec-05')">← Anterior: 3.5 Service</a>
+                    <a href="#cap-03-sec-07" onclick="navigateTo('cap-03-sec-07')">Próximo: 3.7 Validação →</a>
                 </div>
             </article>
 
@@ -3136,13 +3731,13 @@ app.Run();</code></pre>
                     phase: "Estrutura",
                     desc: "Casos de uso, DTOs de entrada e saída, handlers e validação de comandos.",
                     items: [
-                        { id: "cap-03-sec-01", num: "3.1", title: "3.1 Criando o projeto Application", status: "proximo" },
-                        { id: "cap-03-sec-02", num: "3.2", title: "3.2 Casos de uso", status: "planejado" },
-                        { id: "cap-03-sec-03", num: "3.3", title: "3.3 Request", status: "planejado" },
-                        { id: "cap-03-sec-04", num: "3.4", title: "3.4 Response", status: "planejado" },
-                        { id: "cap-03-sec-05", num: "3.5", title: "3.5 Service", status: "planejado" },
-                        { id: "cap-03-sec-06", num: "3.6", title: "3.6 Handler", status: "planejado" },
-                        { id: "cap-03-sec-07", num: "3.7", title: "3.7 Validação", status: "planejado" },
+                        { id: "cap-03-sec-01", num: "3.1", title: "3.1 Criando o projeto Application", status: "concluido" },
+                        { id: "cap-03-sec-02", num: "3.2", title: "3.2 Casos de uso", status: "concluido" },
+                        { id: "cap-03-sec-03", num: "3.3", title: "3.3 Request", status: "concluido" },
+                        { id: "cap-03-sec-04", num: "3.4", title: "3.4 Response", status: "concluido" },
+                        { id: "cap-03-sec-05", num: "3.5", title: "3.5 Service", status: "concluido" },
+                        { id: "cap-03-sec-06", num: "3.6", title: "3.6 Handler", status: "concluido" },
+                        { id: "cap-03-sec-07", num: "3.7", title: "3.7 Validação", status: "proximo" },
                         { id: "cap-03-sec-08", num: "3.8", title: "3.8 Tratamento de erros", status: "planejado" },
                         { id: "cap-03-sec-09", num: "3.9", title: "3.9 Testando os casos de uso", status: "planejado" }
                     ]

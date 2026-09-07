@@ -192,7 +192,7 @@ Este microsserviço é o laboratório de implementação dos seguintes capítulo
 
 - **Capítulo 1:** Entendendo o Problema (Requisitos 1.1 a 1.7)
 - **Capítulo 2:** Domínio (2.1 a 2.8: projeto Domain, entidades `Product`/`Brand`/`CatalogType`, regras de negócio, decisão sobre Value Objects, relacionamentos por IDs, decisões sobre abstrações e testes unitários xUnit com padrão AAA)
-- **Capítulo 3:** Aplicação (3.1 Criando o projeto Application - Próxima etapa)
+- **Capítulo 3:** Aplicação (3.1 Criando o projeto Application, 3.2 Casos de uso, 3.3 Request, 3.4 Response, 3.5 Service, 3.6 Handler - 3.7 Validação é o Próximo)
 - **Capítulo 4:** Infraestrutura (4.1 Criando o projeto Infrastructure)
 - **Capítulo 5:** API (5.1 Criando o projeto API, Swagger em Development e 5.9 Health Check)
 

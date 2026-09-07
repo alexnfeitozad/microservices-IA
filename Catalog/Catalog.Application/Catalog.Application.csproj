@@ -1,7 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\Catalog.Domain\Catalog.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="8.2.3" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -10,8 +14,5 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="Catalog.Domain\Catalog.Domain.csproj" />
-  </ItemGroup>
 
 </Project>

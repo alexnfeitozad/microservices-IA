@@ -1,7 +1,8 @@
 
 namespace Catalog.Application.Products.CreateProduct
 {
-    public record CreactProductRequest(
+    public record CreateProductRequest(
+        Guid Id,
         string Name,
         string Description,
         decimal Price,
