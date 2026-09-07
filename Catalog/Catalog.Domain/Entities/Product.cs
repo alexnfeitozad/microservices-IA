@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace Catalog.Domain.Entities
 {
     public class Product
@@ -14,7 +9,6 @@ namespace Catalog.Domain.Entities
         public string PictureFileName { get; private set; } = string.Empty;
         public int CatalogTypeId { get; private set; }
         public int CatalogBrandId { get; private set; }
-
 
         public Product(Guid id, string name, decimal price, string description,
          string pictureFileName, int catalogTypeId, int catalogBrandId)
@@ -29,10 +23,76 @@ namespace Catalog.Domain.Entities
             CatalogTypeId = catalogTypeId;
             CatalogBrandId = catalogBrandId;
         }
+        public Product(string name, string description, decimal price, string pictureFileName, int catalogTypeId, int catalogBrandId)
+        {
+            ValidateName(name);
+            ValidatePrice(price);
+            ValidateDescription(description);
+            ValidatePictureFileName(pictureFileName);
+            ValidateCatalogTypeId(catalogTypeId);
+            ValidateCatalogBrandId(catalogBrandId);
+
+            Id = new Guid();
+            Name = name;
+            Price = price;
+            Description = description;
+            PictureFileName = pictureFileName;
+            CatalogTypeId = catalogTypeId;
+            CatalogBrandId = catalogBrandId;
+        }
 
         //regras de negocio Domain
         // Exemplo: Validar que o nome do produto não esteja vazio
-        private void ValidateProduct(string name, decimal price, string description, string pictureFileName, int catalogTypeId, int catalogBrandId)
+        #region Validation Methods
+        private void ValidatePrice(decimal price)
+        {
+            if (price < 0)
+            {
+                throw new ArgumentException("Product price cannot be negative.");
+            }
+        }
+
+        private void ValidateDescription(string description)
+        {
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                throw new ArgumentException("Product description cannot be empty.");
+            }
+        }
+
+        private void ValidateCatalogTypeId(int catalogTypeId)
+        {
+            if (catalogTypeId <= 0)
+            {
+                throw new ArgumentException("Catalog type ID must be greater than zero.");
+            }
+        }
+
+        private void ValidateCatalogBrandId(int catalogBrandId)
+        {
+            if (catalogBrandId <= 0)
+            {
+                throw new ArgumentException("Catalog brand ID must be greater than zero.");
+            }
+        }
+
+        private void ValidatePictureFileName(string pictureFileName)
+        {
+            if (string.IsNullOrWhiteSpace(pictureFileName))
+            {
+                throw new ArgumentException("Product picture file name cannot be empty.");
+            }
+        }
+        private void ValidateName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Product name cannot be empty.");
+            }
+        }
+        // Exemplo: Validar que o nome do produto não esteja vazio
+        public void ValidateProduct(string name, decimal price, string description,
+         string pictureFileName, int catalogTypeId, int catalogBrandId)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -44,7 +104,7 @@ namespace Catalog.Domain.Entities
                 throw new ArgumentException("Product price cannot be negative.");
             }
 
-            if (catalogTypeId <= 0)
+            if (catalogBrandId <= 0)
             {
                 throw new ArgumentException("Catalog type ID must be greater than zero.");
             }
@@ -55,4 +115,5 @@ namespace Catalog.Domain.Entities
             }
         }
     }
+    #endregion validation Methods
 }
