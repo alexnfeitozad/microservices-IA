@@ -191,7 +191,7 @@ dotnet test Tests/Catalog.UnitTests/Catalog.UnitTests.csproj
 Este microsserviço é o laboratório de implementação dos seguintes capítulos do livro **“Construindo Microsserviços”** ([livro_vivo_de_engenharia.html](../livro_vivo_de_engenharia.html)):
 
 - **Capítulo 1:** Entendendo o Problema (Requisitos 1.1 a 1.7)
-- **Capítulo 2:** Domínio (2.1 a 2.5: projeto, entidades `Product`/`Brand`/`CatalogType`, regras de negócio e decisão de não criar Value Objects agora)
+- **Capítulo 2:** Domínio (2.1 a 2.7: projeto, entidades `Product`/`Brand`/`CatalogType`, regras de negócio, decisão de Value Objects, relacionamentos por IDs e decisão pragmática de abstrações)
 - **Capítulo 3:** Aplicação (3.1 Criando o projeto Application)
 - **Capítulo 4:** Infraestrutura (4.1 Criando o projeto Infrastructure)
 - **Capítulo 5:** API (5.1 Criando o projeto API, Swagger em Development e 5.9 Health Check)
