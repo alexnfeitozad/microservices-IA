@@ -2031,7 +2031,9 @@ CatalogType 1 ─ N Product
                         <span class="flow-arrow">→</span>
                         <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">2.4 Regras de negócio ✅</span>
                         <span class="flow-arrow">→</span>
-                        <span class="flow-step" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">2.5 Value Objects ⬅️ PRÓXIMO</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">2.5 Value Objects ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">2.6 Relacionamentos ⬅️ PRÓXIMO</span>
                     </div>
                 </div>
 
@@ -2047,136 +2049,204 @@ CatalogType 1 ─ N Product
                         <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 2 • DOMÍNIO</span>
                         <h2 style="margin:0.25rem 0 0 0;">2.5 Value Objects</h2>
                     </div>
-                    <span class="status-badge proximo"><span class="status-dot proximo"></span> ○ Próximo</span>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
                 </div>
 
                 <div class="learning-box">
-                    <h4>Decisão Arquitetural Mapeada</h4>
-                    <p style="margin:0; font-size: 0.95rem;">Avaliação pragmática de Value Objects no domínio Catalog, análise campo a campo de Product e a decisão arquitetural consciente de evitar complexidade acidental.</p>
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Análise aprofundada de conceitos do domínio Catalog para Value Objects e a decisão arquitetural consciente de manter tipos primitivos para evitar complexidade acidental e abstrações prematuras.</p>
                 </div>
 
-                <h3>A PERGUNTA CERTA ANTES DE CRIAR QUALQUER COISA</h3>
-                <p>Antes de abrir novos arquivos ou criar classes só para seguir um checklist dogmático, fazemos a pergunta que todo bom engenheiro de software deve se acostumar a fazer:</p>
-                <blockquote style="border-left: 4px solid var(--primary); margin: 1rem 0; padding: 0.75rem 1rem; background: #f8fafc; font-size: 1.05rem; font-weight: 500; color: var(--text-heading); border-radius: 0 4px 4px 0;">
-                    "Existe algum dado dentro de Product que realmente se beneficia de virar um Value Object?"
-                </blockquote>
+                <h3>O QUE FOI ANALISADO</h3>
+                <p>Nesta etapa, analisamos criticamente se o domínio <strong>Catalog</strong> possui algum conceito que justifique a criação de <strong>Value Objects</strong>.</p>
+                <p>Foram avaliados principalmente:</p>
+                <ul>
+                    <li><code>Product.Price</code></li>
+                    <li><code>Product.Name</code></li>
+                    <li><code>Product.PictureFileName</code></li>
+                </ul>
+                <p>Além das propriedades de <code>Product</code>, também avaliamos <code>Brand.Name</code> e <code>CatalogType.Name</code> para verificar se algum nome ou identificador secundário justificava um tipo dedicado.</p>
 
-                <h3>O QUE É VALUE OBJECT?</h3>
-                <p><strong>Value Object</strong> (ou <em>Objeto de Valor</em>) é um objeto que é definido exclusivamente pelo seu valor, e <strong>não</strong> por um identificador próprio (Id). Se dois objetos possuem exatamente os mesmos atributos, eles são considerados equivalentes.</p>
-
-                <p><strong>Exemplo simples:</strong></p>
-                <p><code>Preço = 99,90</code></p>
-                <p>O preço não precisa ter um <code>Id</code>.</p>
-
-                <p>Mas poderíamos ter um conceito mais rico:</p>
-                <div class="mental-flow-strip" style="background:#f1f5f9;">
-                    <span class="flow-step" style="background:#3b82f6; color:#fff;">Money</span>
-                    <span class="flow-arrow">├──</span>
-                    <span class="flow-step">Amount = 99,90</span>
-                    <span class="flow-arrow">└──</span>
-                    <span class="flow-step">Currency = BRL</span>
-                </div>
-                <p>Nesse caso, <code>Money</code> representaria um conceito explícito do domínio se tivéssemos conversão cambial, múltiplas moedas ou regras de arredondamento específicas.</p>
-
-                <h3>OLHANDO NOSSO PRODUCT</h3>
-                <p>Hoje temos em nossa entidade:</p>
-                <div class="code-container">
-                    <div class="code-header">
-                        <span>Campos Atuais do Product</span>
-                    </div>
-                    <pre><code>public Guid Id { get; private set; }
-public string Name { get; private set; }
-public string Description { get; private set; }
-public decimal Price { get; private set; }
-public string PictureFileName { get; private set; }
-public int CatalogTypeId { get; private set; }
-public int CatalogBrandId { get; private set; }</code></pre>
-                </div>
-
-                <h3>ANÁLISE CAMPO A CAMPO</h3>
-                <p>Vamos separar e avaliar criticamente cada campo:</p>
+                <h3>ANÁLISE DETALHADA CAMPO A CAMPO</h3>
+                <p>Avaliamos individualmente cada dado da entidade <code>Product</code>:</p>
 
                 <table class="domain-comparison-table">
                     <thead>
                         <tr>
-                            <th>Campo</th>
+                            <th>Campo / Propriedade</th>
                             <th>Value Object agora?</th>
-                            <th>Motivo Técnico</th>
+                            <th>Motivo Técnico & Decisão</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><code>Id</code></td>
+                            <td><code>Id</code> (Guid)</td>
                             <td>❌</td>
-                            <td>Identidade única da entidade.</td>
+                            <td>Identidade única global da entidade.</td>
                         </tr>
                         <tr>
-                            <td><code>Name</code></td>
+                            <td><code>Name</code> (string)</td>
                             <td>❌</td>
-                            <td>String simples neste domínio (não exige regras complexas de composição).</td>
+                            <td>String simples neste estágio. Não possui regras complexas de composição que justifiquem um <code>ProductName</code>.</td>
                         </tr>
                         <tr>
-                            <td><code>Description</code></td>
+                            <td><code>Description</code> (string)</td>
                             <td>❌</td>
-                            <td>String simples descritiva.</td>
+                            <td>String simples descritiva para o catálogo.</td>
                         </tr>
                         <tr>
-                            <td><code>Price</code></td>
-                            <td>🤔</td>
-                            <td>Pode representar um conceito mais rico, mas hoje é apenas valor numérico decimal com validação de não-negativo.</td>
+                            <td><code>Price</code> (decimal)</td>
+                            <td>❌</td>
+                            <td>Poderia ser um candidato a <code>Money</code>, mas hoje é apenas um valor monetário único em moeda local com validação de não-negativo.</td>
                         </tr>
                         <tr>
-                            <td><code>PictureFileName</code></td>
+                            <td><code>PictureFileName</code> (string)</td>
                             <td>❌</td>
-                            <td>String simples apontando para o nome do arquivo. Não há necessidade ainda.</td>
+                            <td>String simples referenciando o arquivo de imagem. Não requer objeto de valor.</td>
                         </tr>
                         <tr>
-                            <td><code>CatalogTypeId</code></td>
+                            <td><code>CatalogTypeId</code> (int)</td>
                             <td>❌</td>
-                            <td>Referência de relacionamento para outra entidade (Tipo).</td>
+                            <td>Chave estrangeira/referência de relacionamento com a entidade <code>CatalogType</code>.</td>
                         </tr>
                         <tr>
-                            <td><code>CatalogBrandId</code></td>
+                            <td><code>CatalogBrandId</code> (int)</td>
                             <td>❌</td>
-                            <td>Referência de relacionamento para outra entidade (Marca).</td>
+                            <td>Chave estrangeira/referência de relacionamento com a entidade <code>Brand</code>.</td>
                         </tr>
                     </tbody>
                 </table>
 
-                <h3>ENTÃO TEMOS UMA DECISÃO IMPORTANTE</h3>
-                <p><strong>Não vamos criar <code>Money</code> simplesmente porque "DDD manda".</strong></p>
-                <p>Neste momento, não precisamos dele. Nosso <code>Price</code> ainda é apenas <code>decimal</code>, e isso é <strong>perfeitamente válido</strong>.</p>
-                <p><em>Value Object só entra quando ele representa um conceito que realmente merece comportamento e significado próprios.</em></p>
-                <p>Isso é justamente uma decisão arquitetural que precisamos aprender a defender perante a equipe e os stakeholders.</p>
-
-                <h3>E O QUE O ESHOP ORIGINAL FAZIA?</h3>
-                <p>No eShop clássico da Microsoft, o <code>Product</code> também tratava o preço essencialmente como um valor numérico:</p>
+                <h3>DECISÃO</h3>
+                <p><strong>Nenhum Value Object foi criado nesta etapa.</strong></p>
+                <p>A propriedade:</p>
                 <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.Domain/Entities/Product.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>public decimal Price { get; private set; }</code></pre>
+                </div>
+                <p><strong>continua sendo <code>decimal</code>.</strong></p>
+                <p>O motivo é que, neste estágio do domínio, não existe comportamento ou regra suficientemente complexa que justifique encapsular o preço em um objeto de valor.</p>
+                <p>Também <strong>não</strong> foi criado um <code>ProductName</code>, <code>BrandName</code>, <code>Money</code> ou <code>PictureFileName</code> como Value Object.</p>
+
+                <h3>CONCEITO APRENDIDO</h3>
+                <p>Um <strong>Value Object</strong> é um objeto definido pelo seu <strong>valor</strong> (e não por um <code>Id</code>) e utilizado quando um conceito do domínio possui significado e/ou comportamento próprio que justifica seu encapsulamento.</p>
+                <p>Dois Value Objects com os mesmos valores são considerados idênticos e intercambiáveis (ex: duas notas de R$ 100 têm o mesmo valor).</p>
+                
+                <div class="methodology-box">
+                    <h3>💡 Ponto Principal Aprendido</h3>
+                    <blockquote style="margin:0 0 0.5rem 0; font-size:1.05rem; font-weight:600; color:var(--primary);">
+                        "Não devemos criar Value Objects apenas porque estamos utilizando DDD."
+                    </blockquote>
+                    <p style="margin:0; font-size:0.95rem;">A decisão correta depende da necessidade real do domínio.</p>
+                </div>
+
+                <h3>EXEMPLO DE EVOLUÇÃO</h3>
+                <p>Isso demonstra que a arquitetura pode evoluir conforme o domínio evolui:</p>
+
+                <div class="diagram-container" style="background:#ffffff; max-width:650px; margin:1rem auto;">
+                    <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.9rem; line-height:1.5; color:var(--text-heading);">
+Hoje:
+
+Price
+  ↓
+decimal
+
+Se os requisitos mudarem:
+
+Price
+  ↓
+valor + moeda + regras específicas
+  ↓
+Money
+  ↓
+Value Object
+                    </pre>
+                </div>
+
+                <p>Se amanhã o catálogo passar a vender em múltiplas moedas (BRL, USD, EUR) ou exigir taxas e arredondamentos cambiais dinâmicos, o <code>decimal</code> evoluirá naturalmente para um Value Object <code>Money</code>, sem trauma.</p>
+
+                <h3>COMPARAÇÃO COM O ESHOP ORIGINAL</h3>
+                <p>O eShop original da Microsoft também tratava <code>Price</code> como <code>decimal</code>:</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>eShopOnContainers (Referência Original)</span>
+                    </div>
                     <pre><code>public decimal Price { get; set; }</code></pre>
                 </div>
-                <p>Não havia um <code>Money</code> sofisticado envolvendo o preço. Então aqui temos um ótimo exemplo de evolução racional:</p>
-                <ul>
-                    <li>DDD diz: <em>"Você pode usar Value Objects."</em></li>
-                    <li>Nós perguntamos: <em>"Precisamos?"</em></li>
-                    <li>Resposta: <strong>"Neste momento, não."</strong></li>
-                </ul>
-                <p>E seguimos. <strong>Isso é arquitetura prática. 👍</strong></p>
+                <p>Como não identificamos uma necessidade concreta para alterar essa abordagem, decidimos manter a solução simples.</p>
+                
+                <div class="learning-box" style="border-left-color: #10b981; background: #ecfdf5;">
+                    <h4 style="color: #065f46;">A Lição de Engenharia</h4>
+                    <blockquote style="margin:0; font-size:0.95rem; font-weight:600; color:#065f46;">
+                        "Modernizar não significa mudar tudo. Uma abordagem antiga pode continuar sendo adequada quando resolve corretamente o problema atual."
+                    </blockquote>
+                </div>
 
-                <h3>MAS ENTÃO O CAPÍTULO 2.5 TERMINA SEM CÓDIGO?</h3>
-                <p><strong>Sim. E isso é fundamental.</strong></p>
-                <p>Não precisamos fabricar código para preencher um capítulo. Saber <em>quando não adicionar complexidade acidental</em> é uma das maiores virtudes de um engenheiro de software.</p>
+                <div class="methodology-box">
+                    <h3>🎓 Aprendizado Reutilizável de Engenharia</h3>
+                    <p>Ao projetar qualquer sistema de software, siga o fluxo orientado a necessidades reais:</p>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem; margin:1rem 0;">
+                        <div style="background:#ecfdf5; border:1px solid #10b981; border-radius:6px; padding:1rem; text-align:center;">
+                            <div style="font-weight:700; color:#065f46; margin-bottom:0.5rem;">✅ Abordagem Pragmática</div>
+                            <div style="font-family:'Fira Code', monospace; font-size:0.9rem; line-height:1.6; color:#065f46;">
+                                Problema<br>
+                                ↓<br>
+                                Necessidade<br>
+                                ↓<br>
+                                Solução
+                            </div>
+                        </div>
+                        <div style="background:#fef2f2; border:1px solid #ef4444; border-radius:6px; padding:1rem; text-align:center;">
+                            <div style="font-weight:700; color:#991b1b; margin-bottom:0.5rem;">❌ Dogmatismo Técnico</div>
+                            <div style="font-family:'Fira Code', monospace; font-size:0.9rem; line-height:1.6; color:#991b1b;">
+                                Padrão<br>
+                                ↓<br>
+                                forçar sua utilização
+                            </div>
+                        </div>
+                    </div>
+
+                    <p style="margin-top:0.75rem; margin-bottom:0; font-weight:600; color:var(--text-heading);">
+                        Saber quando <u>NÃO</u> criar uma abstração é uma habilidade arquitetural fundamental.
+                    </p>
+                </div>
 
                 <div class="arch-card">
                     <h4>Registro de Decisão Arquitetural (ADR)</h4>
                     <div class="arch-title">2.5 Value Objects — Decisão no Domínio Catalog</div>
-                    <div class="arch-item"><span class="arch-label">Decisão:</span> Neste momento o domínio de Catalog não possui um conceito que justifique a criação de um Value Object. <code>Price</code> permanece como <code>decimal</code>.</div>
-                    <div class="arch-item"><span class="arch-label">Motivo:</span> Não existe necessidade de encapsular comportamento ou regras adicionais de moedas/câmbio nesse valor neste estágio.</div>
-                    <div class="arch-item"><span class="arch-label">Benefício:</span> Mantém a entidade enxuta e evita mapeamentos complexos desnecessários na persistência de dados.</div>
+                    <div class="arch-item"><span class="arch-label">Decisão:</span> Nenhum Value Object foi criado nesta etapa. <code>Price</code> permanece como <code>decimal</code>. Não foram criados <code>ProductName</code>, <code>BrandName</code>, <code>Money</code> ou <code>PictureFileName</code>.</div>
+                    <div class="arch-item"><span class="arch-label">Motivo:</span> Neste estágio do domínio, não existe comportamento ou regra suficientemente complexa que justifique encapsular esses valores em objetos de valor.</div>
+                    <div class="arch-item"><span class="arch-label">Benefício:</span> Mantém a arquitetura enxuta, direta e evita mapeamentos complexos desnecessários na persistência de dados.</div>
                 </div>
 
-                <div class="methodology-box">
+                <div class="methodology-box" style="margin-top:1.5rem;">
                     <h3>🧱 Progresso da Construção — Domínio</h3>
-                    <div class="mental-flow-strip">
+                    <p style="margin-bottom:0.5rem; font-size:0.9rem; color:var(--text-light);"><strong>CAPÍTULO 2 → DOMÍNIO</strong></p>
+                    <div class="diagram-container" style="background:#ffffff; margin:0.5rem 0; padding:1rem;">
+                        <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.6; color:var(--text-heading);">
+2.1 Criando o projeto Domain       ✅
+2.2 Identificando as entidades     ✅
+2.3 Construindo as Entidades       ✅
+2.3.1 Estrutura base           ✅
+2.3.2 Product                  ✅
+2.3.3 Brand                    ✅
+2.3.4 CatalogType              ✅
+2.3.5 Identidade               ✅
+2.3.6 Encapsulamento           ✅
+2.3.7 Construtores             ✅
+2.3.8 Estado                   ✅
+2.4 Regras de negócio              ✅
+2.5 Value Objects                  ✅
+2.6 Relacionamentos                ✅
+2.7 Abstrações necessárias         ✅
+2.8 Testando o domínio             ⬅️ PRÓXIMO
+                        </pre>
+                    </div>
+                    <div class="mental-flow-strip" style="margin-top:1rem;">
                         <span class="flow-step">2.1 Criando o projeto Domain ✅</span>
                         <span class="flow-arrow">→</span>
                         <span class="flow-step">2.2 Identificando as entidades ✅</span>
@@ -2185,23 +2255,411 @@ public int CatalogBrandId { get; private set; }</code></pre>
                         <span class="flow-arrow">→</span>
                         <span class="flow-step">2.4 Regras de negócio ✅</span>
                         <span class="flow-arrow">→</span>
-                        <span class="flow-step" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">2.5 Value Objects ⬅️ PRÓXIMO</span>
+                        <span class="flow-step">2.5 Value Objects ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">2.6 Relacionamentos ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">2.7 Abstrações necessárias ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">2.8 Testando o domínio ⬅️ PRÓXIMO</span>
                     </div>
                 </div>
 
                 <h3>GANCHO PARA O PRÓXIMO PASSO</h3>
-                <p>Agora sim, vamos para <strong>2.6 Relacionamentos</strong>.</p>
-                <p>E aqui começa uma parte interessante, porque o <code>Product</code> já possui:</p>
+                <p>Com as entidades estruturadas, suas regras protegidas e os tipos de dados conscientemente definidos, o próximo passo é <strong>2.6 Relacionamentos</strong>.</p>
+                <p>Em <code>Product</code>, já possuímos os campos:</p>
                 <div class="code-container">
                     <pre><code>public int CatalogTypeId { get; private set; }
 public int CatalogBrandId { get; private set; }</code></pre>
                 </div>
-                <p>A pergunta será: <strong>Esses dois IDs são apenas números ou representam relacionamentos reais dentro do domínio?</strong></p>
-                <p>É aí que vamos construir o próximo pedaço. 🧱</p>
+                <p>Vamos analisar como esses relacionamentos conceituais devem ser tratados e navegados dentro do domínio puro. 🧱</p>
 
                 <div class="section-nav-flow">
                     <a href="#cap-02-sec-04" onclick="navigateTo('cap-02-sec-04')">← Anterior: 2.4 Regras de negócio</a>
                     <a href="#cap-02-sec-06" onclick="navigateTo('cap-02-sec-06')">Próximo: 2.6 Relacionamentos →</a>
+                </div>
+            </article>
+
+            <article class="page-section" id="cap-02-sec-06">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 2 • DOMÍNIO</span>
+                        <h2 style="margin:0.25rem 0 0 0;">2.6 Relacionamentos</h2>
+                    </div>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Modelagem pragmática dos relacionamentos conceituais no domínio puro através de identificadores explícitos, preservando o desacoplamento e a pureza das entidades.</p>
+                </div>
+
+                <h3>CONTEXTO DO QUE FOI CONSTRUÍDO</h3>
+                <p>O microsserviço <strong>Catalog</strong> possui atualmente as seguintes entidades:</p>
+                <ul>
+                    <li><code>Product</code></li>
+                    <li><code>Brand</code></li>
+                    <li><code>CatalogType</code></li>
+                </ul>
+
+                <p>O relacionamento conceitual identificado no domínio é:</p>
+
+                <div class="diagram-container" style="background:#ffffff; text-align:center; padding:1.25rem;">
+                    <pre style="margin:0; font-family:'Fira Code', monospace; color:var(--text-heading); font-size:0.95rem; line-height:1.6;">
+Brand 1 ──────────── N Product
+
+CatalogType 1 ────── N Product
+                    </pre>
+                </div>
+
+                <p>A entidade <code>Product</code> possui as propriedades:</p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.Domain/Entities/Product.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>public int CatalogBrandId { get; private set; }
+public int CatalogTypeId { get; private set; }</code></pre>
+                </div>
+
+                <p>E protege essas associações garantindo invariantes numéricas válidas tanto no construtor quanto em <code>UpdateDetails(...)</code>:</p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Validação de Invariantes em Product.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>private static void ValidateCatalogBrandId(int catalogBrandId)
+{
+    if (catalogBrandId <= 0)
+    {
+        throw new ArgumentException("Catalog brand ID must be greater than zero.");
+    }
+}
+
+private static void ValidateCatalogTypeId(int catalogTypeId)
+{
+    if (catalogTypeId <= 0)
+    {
+        throw new ArgumentException("Catalog type ID must be greater than zero.");
+    }
+}</code></pre>
+                </div>
+
+                <h3>DECISÃO ARQUITETURAL</h3>
+                <p>Foi decidido <strong>manter o relacionamento no domínio utilizando apenas os identificadores das entidades relacionadas</strong> (<code>CatalogBrandId</code> e <code>CatalogTypeId</code>).</p>
+
+                <p><strong>NÃO</strong> foram adicionadas <em>navigation properties</em> como:</p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Exemplo de Navigation Properties NÃO Adicionadas ao Domínio</span>
+                    </div>
+                    <pre><code>// ❌ NÃO utilizadas neste estágio do domínio:
+public Brand Brand { get; private set; }
+public CatalogType CatalogType { get; private set; }</code></pre>
+                </div>
+
+                <div class="arch-card">
+                    <h4>Registro de Decisão Arquitetural (ADR)</h4>
+                    <div class="arch-title">2.6 Relacionamentos no Domínio Catalog</div>
+                    <div class="arch-item"><span class="arch-label">Decisão:</span> O domínio representa os relacionamentos entre <code>Product</code>, <code>Brand</code> e <code>CatalogType</code> exclusivamente por seus identificadores numéricos (<code>int</code>).</div>
+                    <div class="arch-item"><span class="arch-label">Motivo:</span> O domínio atual não possui necessidade de navegar diretamente para <code>Brand</code> ou <code>CatalogType</code>. <code>Product</code> precisa apenas representar que pertence a uma determinada marca e a determinado tipo, e os identificadores já atendem com precisão essa relação.</div>
+                    <div class="arch-item"><span class="arch-label">Isolamento Técnico:</span> Decidido não introduzir neste momento detalhes de persistência ou Entity Framework Core no domínio puro.</div>
+                    <div class="arch-item"><span class="arch-label">Mapeamento Físico:</span> O mapeamento físico desses relacionamentos será tratado posteriormente na camada <code>Infrastructure</code>.</div>
+                </div>
+
+                <h3>ANÁLISE DE TRADE-OFFS & ESCOPO DA ESCOLHA</h3>
+                <p>Esta escolha arquitetural é perfeitamente válida para o estágio e necessidades atuais do microsserviço <strong>Catalog</strong>, e <strong>não</strong> uma regra universal para todos os microsserviços:</p>
+
+                <table class="domain-comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Abordagem</th>
+                            <th>Vantagens (Pros)</th>
+                            <th>Trade-offs / Considerações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Relacionamento por ID (Adotada)</strong></td>
+                            <td>
+                                • Mantém o Domínio 100% puro e sem dependência de ORMs.<br>
+                                • Evita ciclos de carregamento pesado de memória e complexidade de proxies.<br>
+                                • Entidades mantêm limites e responsabilidades claras e desacopladas.
+                            </td>
+                            <td>
+                                • Se <code>Product</code> precisasse computar uma regra usando propriedades de <code>Brand</code>, o dado teria de ser passado explicitamente via parâmetro de método.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Navigation Properties (Instâncias Completas)</strong></td>
+                            <td>
+                                • Permite navegação direta do objeto em memória (ex: <code>product.Brand.Name</code>).
+                            </td>
+                            <td>
+                                • Facilita o acoplamento excessivo e carregamento indiscriminado de tabelas.<br>
+                                • Pode violar as fronteiras de Agregados no Domain-Driven Design (DDD).
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size:0.9rem; color:var(--text-light); margin-top:0.5rem;"><em>Contexto: Em microsserviços onde entidades formam um Agregado coeso e inseparável (como um Pedido e seus Itens de Pedido), o uso de propriedades de navegação na raiz do agregado é natural. No caso do Catálogo, produtos, marcas e tipos são entidades com ciclos de vida independentes, tornando a referência por ID a escolha mais limpa.</em></p>
+
+                <h3>⚠️ REGRA IMPORTANTE APRENDIDA: FRONTEIRAS DE VALIDAÇÃO</h3>
+                <p>Existe uma diferença fundamental entre validação em memória e consulta de integridade referencial externa:</p>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem; margin:1rem 0;">
+                    <div style="background:#eff6ff; border:1px solid var(--primary); border-radius:6px; padding:1rem;">
+                        <div style="font-weight:700; color:var(--primary); margin-bottom:0.5rem;">1. Invariante do Domínio (Local)</div>
+                        <p style="font-size:0.9rem; margin:0; line-height:1.5;">
+                            A entidade <code>Product</code> valida que <code>CatalogBrandId &gt; 0</code> e <code>CatalogTypeId &gt; 0</code>. Ela garante localmente que o identificador possui um formato válido antes de compor seu estado.
+                        </p>
+                    </div>
+                    <div style="background:#fef3c7; border:1px solid #f59e0b; border-radius:6px; padding:1rem;">
+                        <div style="font-weight:700; color:#b45309; margin-bottom:0.5rem;">2. Verificação de Existência (Persistência / Aplicação)</div>
+                        <p style="font-size:0.9rem; margin:0; line-height:1.5;">
+                            A entidade <strong>NÃO</strong> deve consultar o banco de dados para verificar se <code>Brand</code> ou <code>CatalogType</code> existem. Essa responsabilidade pertence às camadas de <code>Application</code> e <code>Infrastructure</code>.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="methodology-box">
+                    <h3>🎓 Aprendizado Arquitetural Reutilizável</h3>
+                    <p>Nem todo relacionamento precisa ser representado no domínio com navigation properties. Devemos adicionar apenas o que o domínio realmente necessita.</p>
+                    <blockquote style="margin:0.75rem 0 0.5rem 0; font-size:1.05rem; font-weight:600; color:var(--primary);">
+                        "Não vamos introduzir uma abstração ou estrutura apenas porque ela é comum em determinado framework. Primeiro identificamos a necessidade, depois construímos."
+                    </blockquote>
+                </div>
+
+                <div class="methodology-box" style="margin-top:1.5rem;">
+                    <h3>🧱 Progresso da Construção — Domínio</h3>
+                    <p style="margin-bottom:0.5rem; font-size:0.9rem; color:var(--text-light);"><strong>CAPÍTULO 2 → DOMÍNIO</strong></p>
+                    <div class="diagram-container" style="background:#ffffff; margin:0.5rem 0; padding:1rem;">
+                        <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.6; color:var(--text-heading);">
+2.1 Criando o projeto Domain       ✅
+2.2 Identificando as entidades     ✅
+2.3 Construindo as Entidades       ✅
+2.3.1 Estrutura base           ✅
+2.3.2 Product                  ✅
+2.3.3 Brand                    ✅
+2.3.4 CatalogType              ✅
+2.3.5 Identidade               ✅
+2.3.6 Encapsulamento           ✅
+2.3.7 Construtores             ✅
+2.3.8 Estado                   ✅
+2.4 Regras de negócio              ✅
+2.5 Value Objects                  ✅
+2.6 Relacionamentos                ✅
+2.7 Abstrações necessárias         ✅
+2.8 Testando o domínio             ⬅️ PRÓXIMO
+                        </pre>
+                    </div>
+                    <div class="mental-flow-strip" style="margin-top:1rem;">
+                        <span class="flow-step">2.1 Criando o projeto Domain ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">2.2 Identificando as entidades ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">2.3 Construindo as Entidades ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">2.4 Regras de negócio ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">2.5 Value Objects ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">2.6 Relacionamentos ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">2.7 Abstrações necessárias ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">2.8 Testando o domínio ⬅️ PRÓXIMO</span>
+                    </div>
+                </div>
+
+                <h3>GANCHO PARA O PRÓXIMO PASSO</h3>
+                <p>Com as entidades <code>Product</code>, <code>Brand</code> e <code>CatalogType</code> estruturadas, suas regras protegidas e os relacionamentos conceituais representados por identificadores, o próximo passo é definir <strong>2.7 Abstrações necessárias</strong>.</p>
+                <p>Vamos estabelecer as interfaces e contratos (como repositórios e abstrações de acesso a dados) que permitirão ao domínio se comunicar com o mundo externo sem se acoplar a nenhuma tecnologia ou banco específico. 🧱</p>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-02-sec-05" onclick="navigateTo('cap-02-sec-05')">← Anterior: 2.5 Value Objects</a>
+                    <a href="#cap-02-sec-07" onclick="navigateTo('cap-02-sec-07')">Próximo: 2.7 Abstrações necessárias →</a>
+                </div>
+            </article>
+
+            <article class="page-section" id="cap-02-sec-07">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">CAPÍTULO 2 • DOMÍNIO</span>
+                        <h2 style="margin:0.25rem 0 0 0;">2.7 Abstrações necessárias</h2>
+                    </div>
+                    <span class="status-badge concluido"><span class="status-dot concluido"></span> ✓ Concluído</span>
+                </div>
+
+                <div class="learning-box">
+                    <h4>Etapa Concluída na Solução</h4>
+                    <p style="margin:0; font-size: 0.95rem;">Avaliação criteriosa de abstrações no domínio e a decisão consciente de manter a simplicidade arquitetural, evitando código prematuro e interfaces desnecessárias.</p>
+                </div>
+
+                <h3>ESTADO ATUAL DO DOMÍNIO</h3>
+                <p>Neste momento, a camada <code>Catalog.Domain</code> possui a seguinte estrutura pura e enxuta:</p>
+
+                <div class="diagram-container" style="background:#ffffff; max-width:480px; margin:1rem 0;">
+                    <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.9rem; line-height:1.5; color:var(--text-heading);">
+Catalog.Domain/
+└── Entities/
+    ├── Product.cs
+    ├── Brand.cs
+    └── CatalogType.cs
+                    </pre>
+                </div>
+
+                <p>As três entidades fundamentais estão modeladas com construtores consistentes, modificadores <code>private set</code> para auto-proteção do estado, métodos explícitos de alteração, validação contínua de invariantes e relacionamentos conceituais representados por identificadores.</p>
+
+                <h3>DECISÕES ARQUITETURAIS NA ETAPA</h3>
+                <p>Nesta etapa, analisamos criticamente quais abstrações deveriam ser adicionadas ao domínio e tomamos as seguintes decisões conscientes:</p>
+
+                <ul>
+                    <li><strong>Não foi criada uma <code>BaseEntity</code>:</strong> Atualmente não existe uma necessidade real ou lógica compartilhada complexa que justifique introduzir uma classe base abstrata e acoplar as entidades em uma hierarquia de herança.</li>
+                    <li><strong>Não foi criado <code>Repository</code> neste momento:</strong> O padrão Repository representa uma preocupação relacionada ao acesso e persistência dos dados. Essa responsabilidade será tratada no momento oportuno, quando a construção alcançar a camada <code>Infrastructure</code> e houver uma necessidade concreta.</li>
+                    <li><strong>Não foi criado <code>Unit of Work</code>:</strong> Não existe necessidade atual no domínio puro que justifique essa abstração transacional.</li>
+                    <li><strong>Não foram criados serviços artificiais:</strong> Evitamos criar classes "Service" no domínio apenas para preencher camadas burocráticas; as regras de negócio residem diretamente nas entidades ricas.</li>
+                    <li><strong>Sem dogmatismo:</strong> Não foram criadas abstrações apenas para seguir cegamente checklists teóricos de Clean Architecture ou DDD.</li>
+                </ul>
+
+                <div class="methodology-box">
+                    <h3>🛡️ Princípios Arquiteturais Registrados</h3>
+                    <blockquote style="margin:0 0 0.75rem 0; font-size:1.05rem; font-weight:600; color:var(--primary);">
+                        "Primeiro identificamos a necessidade. Depois criamos a abstração."
+                    </blockquote>
+                    <blockquote style="margin:0; font-size:1.05rem; font-weight:600; color:var(--primary);">
+                        "Abstração não é sinônimo de arquitetura melhor. Uma abstração deve resolver um problema real ou representar um conceito importante do domínio."
+                    </blockquote>
+                </div>
+
+                <div class="arch-card">
+                    <h4>Registro de Decisão Arquitetural (ADR)</h4>
+                    <div class="arch-title">2.7 Abstrações no Domínio Catalog</div>
+                    <div class="arch-item"><span class="arch-label">Decisão:</span> Manter o domínio puro contendo apenas as entidades essenciais (<code>Product</code>, <code>Brand</code>, <code>CatalogType</code>), sem classes base abstratas, repositórios ou Unit of Work prematuros.</div>
+                    <div class="arch-item"><span class="arch-label">Motivo:</span> Ausência de necessidades concretas de negócio ou persistência neste estágio que justifiquem a criação dessas interfaces.</div>
+                    <div class="arch-item"><span class="arch-label">Evolução:</span> Interfaces de persistência e contratos de acesso a dados serão definidos e implementados conforme as camadas de <code>Application</code> e <code>Infrastructure</code> forem construídas.</div>
+                </div>
+
+                <h3>ANÁLISE DE TRADE-OFFS</h3>
+                <p>Compreender os trade-offs desta escolha é essencial para o desenvolvimento de uma mentalidade de engenharia pragmática:</p>
+
+                <table class="domain-comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Aspecto</th>
+                            <th>Vantagens (Pros)</th>
+                            <th>Trade-offs / Considerações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Domínio Enxuto (Adotado)</strong></td>
+                            <td>
+                                • Reduz drasticamente a complexidade cognitiva e o ruído de código.<br>
+                                • Elimina boilerplate e abstrações prematuras.<br>
+                                • Facilita a manutenção e evolução inicial.
+                            </td>
+                            <td>
+                                • Exige disciplina do time para introduzir a abstração no ponto exato quando a necessidade real emergir.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>O fluxo de responsabilidades quando a necessidade surgir será claro:</p>
+
+                <div class="diagram-container" style="background:#ffffff; max-width:550px; margin:1rem auto; padding:1.25rem;">
+                    <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.9rem; line-height:1.6; color:var(--text-heading);">
+Domain
+  ↓
+define contrato quando necessário (ex: IProductRepository)
+
+Infrastructure
+  ↓
+implementa detalhes técnicos (ex: ProductRepository com EF Core)
+                    </pre>
+                </div>
+
+                <p style="font-size:0.9rem; color:var(--text-light); margin-top:0.5rem;">
+                    <em>Importante: Não estamos afirmando que Repository ou Unit of Work nunca serão utilizados. Eles serão avaliados e incorporados quando a construção alcançar as necessidades de persistência e orquestração de aplicação.</em>
+                </p>
+
+                <div class="methodology-box">
+                    <h3>🎓 Habilidade de Engenharia: Sênior, Tech Lead & Arquitetura</h3>
+                    <p>Uma das marcas distintivas de maturidade em engenharia de software é a capacidade de discernir entre:</p>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem; margin:1rem 0;">
+                        <div style="background:#fef2f2; border:1px solid #ef4444; border-radius:6px; padding:1rem;">
+                            <div style="font-weight:700; color:#991b1b; margin-bottom:0.5rem;">❌ "Criar abstrações porque o padrão manda"</div>
+                            <p style="font-size:0.88rem; margin:0; line-height:1.5; color:#7f1d1d;">
+                                Gera complexidade acidental, excesso de interfaces com apenas uma implementação inútil e falsa sensação de "boa arquitetura".
+                            </p>
+                        </div>
+                        <div style="background:#ecfdf5; border:1px solid #10b981; border-radius:6px; padding:1rem;">
+                            <div style="font-weight:700; color:#065f46; margin-bottom:0.5rem;">✅ "Criar abstrações porque existe uma necessidade real"</div>
+                            <p style="font-size:0.88rem; margin:0; line-height:1.5; color:#064e3b;">
+                                Mantém o software enxuto (YAGNI), altamente compreensível, fácil de testar e pronto para evoluir com base em requisitos reais.
+                            </p>
+                        </div>
+                    </div>
+
+                    <p style="margin-top:0.75rem; margin-bottom:0; font-weight:600; color:var(--text-heading);">
+                        Saber quando <u>NÃO</u> criar uma abstração é uma habilidade fundamental para arquitetos e líderes técnicos.
+                    </p>
+                </div>
+
+                <div class="methodology-box" style="margin-top:1.5rem;">
+                    <h3>🧱 Progresso da Construção — Domínio</h3>
+                    <p style="margin-bottom:0.5rem; font-size:0.9rem; color:var(--text-light);"><strong>CAPÍTULO 2 → DOMÍNIO</strong></p>
+                    <div class="diagram-container" style="background:#ffffff; margin:0.5rem 0; padding:1rem;">
+                        <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.6; color:var(--text-heading);">
+2.1 Criando o projeto Domain       ✅
+2.2 Identificando as entidades     ✅
+2.3 Construindo as Entidades       ✅
+2.3.1 Estrutura base           ✅
+2.3.2 Product                  ✅
+2.3.3 Brand                    ✅
+2.3.4 CatalogType              ✅
+2.3.5 Identidade               ✅
+2.3.6 Encapsulamento           ✅
+2.3.7 Construtores             ✅
+2.3.8 Estado                   ✅
+2.4 Regras de negócio              ✅
+2.5 Value Objects                  ✅
+2.6 Relacionamentos                ✅
+2.7 Abstrações necessárias         ✅
+2.8 Testando o domínio             ⬅️ PRÓXIMO
+                        </pre>
+                    </div>
+                    <div class="mental-flow-strip" style="margin-top:1rem;">
+                        <span class="flow-step">2.1 Criando o projeto Domain ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">2.2 Identificando as entidades ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">2.3 Construindo as Entidades ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">2.4 Regras de negócio ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">2.5 Value Objects ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">2.6 Relacionamentos ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">2.7 Abstrações necessárias ✅</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">2.8 Testando o domínio ⬅️ PRÓXIMO</span>
+                    </div>
+                </div>
+
+                <h3>GANCHO PARA O PRÓXIMO PASSO</h3>
+                <p>Com o modelo de domínio completo, entidades puras estruturadas, regras e relacionamentos implementados e a decisão consciente de não introduzir abstrações prematuras, encerraremos a camada de Domínio na seção <strong>2.8 Testando o domínio</strong>.</p>
+                <p>Vamos criar a suíte de testes unitários automatizados para garantir que 100% das invariantes de <code>Product</code>, <code>Brand</code> e <code>CatalogType</code> estejam validadas e protegidas contra regressões. 🧪</p>
+
+                <div class="section-nav-flow">
+                    <a href="#cap-02-sec-06" onclick="navigateTo('cap-02-sec-06')">← Anterior: 2.6 Relacionamentos</a>
+                    <a href="#cap-02-sec-08" onclick="navigateTo('cap-02-sec-08')">Próximo: 2.8 Testando o domínio →</a>
                 </div>
             </article>
 
@@ -2470,10 +2928,10 @@ app.Run();</code></pre>
                         { id: "cap-02-sec-02", num: "2.2", title: "2.2 Identificando as entidades", status: "concluido" },
                         { id: "cap-02-sec-03", num: "2.3", title: "2.3 Construindo as Entidades", status: "concluido" },
                         { id: "cap-02-sec-04", num: "2.4", title: "2.4 Regras de negócio", status: "concluido" },
-                        { id: "cap-02-sec-05", num: "2.5", title: "2.5 Value Objects", status: "proximo" },
-                        { id: "cap-02-sec-06", num: "2.6", title: "2.6 Relacionamentos", status: "planejado" },
-                        { id: "cap-02-sec-07", num: "2.7", title: "2.7 Abstrações necessárias", status: "planejado" },
-                        { id: "cap-02-sec-08", num: "2.8", title: "2.8 Testando o domínio", status: "planejado" }
+                        { id: "cap-02-sec-05", num: "2.5", title: "2.5 Value Objects", status: "concluido" },
+                        { id: "cap-02-sec-06", num: "2.6", title: "2.6 Relacionamentos", status: "concluido" },
+                        { id: "cap-02-sec-07", num: "2.7", title: "2.7 Abstrações necessárias", status: "concluido" },
+                        { id: "cap-02-sec-08", num: "2.8", title: "2.8 Testando o domínio", status: "proximo" }
                     ]
                 },
                 {
