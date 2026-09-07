@@ -41,8 +41,8 @@ e sessão de compra       faturamento e checkout      e perfis de usuário
 ```
 
 ### ✅ O que pertence ao Catalog:
-- Cadastro, atualização e consulta de itens do catálogo (`CatalogItem`).
-- Gestão de marcas parceiras ou fabricantes (`CatalogBrand`).
+- Cadastro, atualização e consulta de itens do catálogo (`Product`).
+- Gestão de marcas parceiras ou fabricantes (`Brand`).
 - Gestão de categorias/tipos de produto (`CatalogType`).
 - Quantidade física base em estoque cadastrado no catálogo.
 - Publicação de eventos de domínio quando itens ou preços sofrem alterações.
@@ -96,7 +96,11 @@ Catalog/
 ├── Catalog.slnx                             # Solution file moderna (.NET 10)
 ├── README.md                                # Documentação técnica do microsserviço
 ├── Catalog.Domain/                          # Núcleo de domínio (entidades e regras puras)
-│   └── Catalog.Domain.csproj
+│   ├── Catalog.Domain.csproj
+│   └── Entities/
+│       ├── Product.cs
+│       ├── Brand.cs
+│       └── CatalogType.cs
 ├── Catalog.Application/                     # Casos de uso e orquestração de aplicação
 │   └── Catalog.Application.csproj
 ├── Catalog.Infrastructure/                  # Persistência e adaptadores de infraestrutura
@@ -110,7 +114,8 @@ Catalog/
 │       └── launchSettings.json
 └── Tests/                                   # Suíte de testes automatizados
     ├── Catalog.UnitTests/                   # Testes unitários rápidos e isolados
-    │   └── Catalog.UnitTests.csproj
+    │   ├── Catalog.UnitTests.csproj
+    │   └── Entities/                        # Invariantes de Product, Brand e CatalogType
     └── Catalog.IntegrationTests/            # Testes de integração de infraestrutura e API
         └── Catalog.IntegrationTests.csproj
 ```
@@ -162,6 +167,7 @@ Usamos o **eShopOnContainers** clássico como laboratório prático de estudo, m
 5. O serviço estará acessível nos endpoints:
    - Raiz: `http://localhost:<porta>/` (Retorna mensagem de status)
    - Health Check: `http://localhost:<porta>/health` (Retorna `Healthy`)
+   - Swagger UI (Development): `http://localhost:<porta>/swagger`
 
 ---
 
@@ -185,9 +191,9 @@ dotnet test Tests/Catalog.UnitTests/Catalog.UnitTests.csproj
 Este microsserviço é o laboratório de implementação dos seguintes capítulos do livro **“Construindo Microsserviços”** ([livro_vivo_de_engenharia.html](../livro_vivo_de_engenharia.html)):
 
 - **Capítulo 1:** Entendendo o Problema (Requisitos 1.1 a 1.7)
-- **Capítulo 2:** Domínio (2.1 a 2.5: Criação do projeto, Entidades, Regras de Negócio e Decisão Arquitetural de Value Objects)
+- **Capítulo 2:** Domínio (2.1 a 2.5: projeto, entidades `Product`/`Brand`/`CatalogType`, regras de negócio e decisão de não criar Value Objects agora)
 - **Capítulo 3:** Aplicação (3.1 Criando o projeto Application)
 - **Capítulo 4:** Infraestrutura (4.1 Criando o projeto Infrastructure)
-- **Capítulo 5:** API (5.1 Criando o projeto API e 5.9 Health Check)
+- **Capítulo 5:** API (5.1 Criando o projeto API, Swagger em Development e 5.9 Health Check)
 
 Conforme novas entidades, persistência com banco de dados, DTOs e eventos forem construídos, a documentação e os capítulos do livro vivo serão incrementados em tempo real.
