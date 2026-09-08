@@ -3179,9 +3179,9 @@ CAPÍTULO 3 → APLICAÇÃO
 3.2 Casos de uso                 ✅
 3.3 Request                      ✅
 3.4 Response                     ✅
-3.5 Service                      ⬅️ PRÓXIMO
-3.6 Handler
-3.7 Validação
+3.5 Service                      ✅
+3.6 Handler                      ✅
+3.7 Validação                    ⬅️ EM ANDAMENTO
 3.8 Tratamento de erros
 3.9 Testando os casos de uso
                         </pre>
@@ -3195,13 +3195,13 @@ CAPÍTULO 3 → APLICAÇÃO
                         <span class="flow-arrow">→</span>
                         <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:600;">3.3 Request ✅</span>
                         <span class="flow-arrow">→</span>
-                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">3.4 Response ✅</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:600;">3.4 Response ✅</span>
                         <span class="flow-arrow">→</span>
-                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">3.5 Service ✅</span>
+                        <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:600;">3.5 Service ✅</span>
                         <span class="flow-arrow">→</span>
                         <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">3.6 Handler ✅</span>
                         <span class="flow-arrow">→</span>
-                        <span class="flow-step" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">3.7 Validação ⬅️ PRÓXIMO</span>
+                        <span class="flow-step" style="background:#fffbeb; color:#92400e; border:1px solid #fde68a; font-weight:700;">3.7 Validação ⬅️ EM ANDAMENTO</span>
                     </div>
                 </div>
 
@@ -3249,9 +3249,9 @@ CAPÍTULO 3 → APLICAÇÃO
 
 namespace Catalog.Application.Products.CreateProduct;
 
-public class CreateProductService
+public class CreateProductService : ICreateProductService
 {
-    public CreateProductResponse CreateProduct(CreateProductRequest request)
+    public CreateProductResponse Execute(CreateProductRequest request)
     {
         var product = new Product(
             Guid.NewGuid(),
@@ -3278,7 +3278,7 @@ public class CreateProductService
                     <h4>Decisão Arquitetural</h4>
                     <div class="arch-title">Orquestração Pura Sem Poluição de Regras</div>
                     <div class="arch-item"><span class="arch-label">Responsabilidade Coesa:</span> O <code>CreateProductService</code> sabe <em>como coordenar o fluxo</em>, mas não decide regras como preço mínimo ou tamanho de descrição — essa integridade é auto-protegida pelo <code>Product</code>.</div>
-                    <div class="arch-item"><span class="arch-label">Evolução do Design:</span> Para desacoplar a camada de entrega da chamada direta ao serviço e introduzir uma abordagem orientada a intenções explícitas, o caso de uso avança para a separação de <strong>Command</strong> e <strong>Handler</strong>.</div>
+                    <div class="arch-item"><span class="arch-label">Evolução do Design:</span> Para desacoplar a camada de entrega da chamada direta ao serviço e introduzir uma abordagem orientada a intenções explícitas, o caso de uso avança para a separação de <strong>Command</strong> e <strong>Handler</strong>, integrando a abstração formal <code>ICreateProductService</code> (detalhada na seção seguinte).</div>
                 </div>
 
                 <div class="section-nav-flow">
@@ -3299,30 +3299,93 @@ public class CreateProductService
 
                 <div class="learning-box">
                     <h4>Etapa Concluída na Solução</h4>
-                    <p style="margin:0; font-size: 0.95rem;">Implementação do padrão <strong>Command / Handler</strong> com a criação do <code>CreateProductCommand</code> (representando a ordem/intenção de criação) e do <code>CreateProductCommandHandler</code> (encarregado de tratar a ordem e encaminhá-la ao serviço de aplicação).</p>
+                    <p style="margin:0; font-size: 0.95rem;">Implementação do padrão <strong>Command / Handler</strong> com a criação do <code>CreateProductCommand</code> (representando a ordem/intenção de criação), do <code>CreateProductCommandHandler</code> (encarregado de tratar a ordem) e a evolução arquitetural introduzindo a interface <code>ICreateProductService</code> para desacoplamento e inversão de dependência.</p>
                 </div>
 
                 <h3>O QUE FOI CONSTRUÍDO</h3>
-                <p>Consolidamos a estrutura coesa da funcionalidade de cadastro de produtos em <code>Catalog.Application</code> com 5 arquivos especializados:</p>
+                <p>Consolidamos a estrutura coesa da funcionalidade de cadastro de produtos em <code>Catalog.Application</code> com 6 arquivos especializados organizados pelo padrão <em>Feature Folder</em>:</p>
 
                 <div class="diagram-container" style="background:#ffffff; margin:0.5rem 0; padding:1rem;">
                     <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.6; color:var(--text-heading);">
 Catalog.Application
 └── Products
     └── CreateProduct
-        ├── CreateProductRequest.cs
-        ├── CreateProductResponse.cs
+        ├── ICreateProductService.cs
         ├── CreateProductService.cs
         ├── CreateProductCommand.cs
-        └── CreateProductCommandHandler.cs
+        ├── CreateProductCommandHandler.cs
+        ├── CreateProductRequest.cs
+        └── CreateProductResponse.cs
                     </pre>
                 </div>
 
-                <p>Nesta etapa foram adicionados dois novos componentes fundamentais:</p>
+                <p>Nesta etapa, articulamos os componentes essenciais para separar intenção, tratamento, contrato e execução:</p>
                 <ul>
                     <li><strong>CreateProductCommand:</strong> Record posicional que representa explicitamente a ordem ou intenção de criar um produto no sistema.</li>
-                    <li><strong>CreateProductCommandHandler:</strong> Classe que recebe e trata o comando, adaptando os parâmetros e delegando a execução orquestrada ao <code>CreateProductService</code>.</li>
+                    <li><strong>ICreateProductService:</strong> Interface que define o contrato formal esperado pelo Handler para a execução do caso de uso.</li>
+                    <li><strong>CreateProductService:</strong> Implementação concreta do serviço que implementa <code>ICreateProductService</code> e orquestra a criação da entidade no domínio.</li>
+                    <li><strong>CreateProductCommandHandler:</strong> Classe que recebe e trata o comando, delegando a execução orquestrada à abstração <code>ICreateProductService</code> recebida via injeção de dependência.</li>
                 </ul>
+
+                <h3>EVOLUÇÃO DO DESIGN: A INTRODUÇÃO DA INTERFACE DO SERVICE</h3>
+                <p>Durante a construção do caso de uso, foi realizada uma reflexão fundamental sobre o acoplamento entre o Handler e o Service.</p>
+                
+                <p>Inicialmente, no primeiro momento de implementação, o Handler utilizava diretamente a classe concreta do serviço:</p>
+
+                <div class="diagram-container" style="background:#f8fafc; margin:0.5rem 0; padding:1rem; border-left: 4px solid #94a3b8;">
+                    <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.6; color:var(--text-heading);">
+Inicialmente (Acoplamento Direto):
+Handler
+   ↓
+CreateProductService
+                    </pre>
+                </div>
+
+                <p>Em seguida, foi tomada a decisão arquitetural de introduzir uma abstração intermediária entre o executor da intenção e a orquestração do caso de uso:</p>
+
+                <div class="diagram-container" style="background:#eff6ff; margin:0.5rem 0; padding:1rem; border-left: 4px solid var(--primary);">
+                    <pre style="margin:0; font-family:'Fira Code', monospace; font-size:0.85rem; line-height:1.6; color:var(--text-heading);">
+Com a Abstração (Inversão de Dependência):
+Handler
+   ↓
+ICreateProductService
+   ↑
+CreateProductService
+                    </pre>
+                </div>
+
+                <p>Com essa refatoração, o Handler <strong>agora conhece exclusivamente o contrato (<code>ICreateProductService</code>)</strong> e não mais a implementação concreta. Ele sabe qual operação deve invocar (<code>Execute</code>), mas não depende dos detalhes ou da instanciação direta de <code>CreateProductService</code>.</p>
+
+                <div class="arch-card" style="border-left-color: #2563eb;">
+                    <h4>Por que introduzir a interface neste momento?</h4>
+                    <div class="arch-title">Motivações Técnicas da Decisão</div>
+                    <div class="arch-item">
+                        <ul style="margin:0.25rem 0 0 1.25rem; font-size:0.9rem; line-height:1.7;">
+                            <li><strong>Reduzir acoplamento:</strong> O Handler deixa de depender de uma classe concreta de serviço, tornando o código mais modular e independente.</li>
+                            <li><strong>Permitir trocar a implementação:</strong> No futuro, se for necessário substituir ou estender o serviço (ex.: implementação assíncrona, cache, decoradores), o Handler não precisará de nenhuma alteração.</li>
+                            <li><strong>Facilitar testes futuros:</strong> Permite isolar os testes unitários do Handler através de mocks ou fakes da interface <code>ICreateProductService</code>, sem precisar instanciar entidades de domínio nem dependências do serviço.</li>
+                            <li><strong>Deixar explícito o contrato esperado pelo Handler:</strong> A assinatura <code>Execute(CreateProductRequest request)</code> deixa inequívoco o que o consumidor da operação necessita fornecer e esperar.</li>
+                            <li><strong>Aplicar Dependency Inversion de forma concreta:</strong> O princípio da Inversão de Dependência (DIP - letra D do SOLID) determina que módulos de alto nível não devem depender de módulos de baixo nível; ambos devem depender de abstrações.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="arch-card" style="border-left-color: #10b981;">
+                    <h4>Decisão Arquitetural Fundamental</h4>
+                    <div class="arch-title">Primeiro Identificamos a Necessidade. Depois Criamos a Abstração.</div>
+                    <div class="arch-item">
+                        <span class="arch-label">Decisão Importante:</span>
+                        <strong>Interfaces não devem ser criadas automaticamente para todas as classes.</strong> A abstração foi introduzida neste momento porque o Handler passou a depender diretamente do Service e havia uma necessidade concreta de desacoplamento.
+                    </div>
+                    <div class="arch-item">
+                        <span class="arch-label">Princípio Pragmático:</span>
+                        <em>“Primeiro identificamos a necessidade. Depois criamos a abstração.”</em>
+                    </div>
+                    <div class="arch-item">
+                        <span class="arch-label">Sem Dogmas:</span>
+                        Não apresentamos a criação de interfaces como uma regra absoluta ou obrigatória de Clean Architecture. A abstração só se justifica quando resolve um problema concreto de arquitetura, acoplamento ou testabilidade.
+                    </div>
+                </div>
 
                 <h3>CÓDIGOS IMPLEMENTADOS</h3>
 
@@ -3344,18 +3407,68 @@ public record CreateProductCommand(
 
                 <div class="code-container">
                     <div class="code-header">
-                        <span>Catalog.Application/Products/CreateProduct/CreateProductCommandHandler.cs</span>
+                        <span>Catalog.Application/Products/CreateProduct/ICreateProductService.cs</span>
                         <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
                     </div>
                     <pre><code>namespace Catalog.Application.Products.CreateProduct;
 
+public interface ICreateProductService
+{
+    CreateProductResponse Execute(CreateProductRequest request);
+}</code></pre>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.Application/Products/CreateProduct/CreateProductService.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>namespace Catalog.Application.Products.CreateProduct;
+
+public class CreateProductService : ICreateProductService
+{
+    public CreateProductResponse Execute(CreateProductRequest request)
+    {
+        var product = new Domain.Entities.Product(
+            request.Name,
+            request.Description,
+            request.Price,
+            request.PictureFileName,
+            request.CatalogTypeId,
+            request.CatalogBrandId);
+
+        return new CreateProductResponse(
+            product.Id,
+            product.Name,
+            product.Description,
+            product.Price,
+            product.PictureFileName,
+            product.CatalogTypeId,
+            product.CatalogBrandId);
+    }
+}</code></pre>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Catalog.Application/Products/CreateProduct/CreateProductCommandHandler.cs</span>
+                        <button class="btn-copy" onclick="copyCode(this)" aria-label="Copiar código">Copiar</button>
+                    </div>
+                    <pre><code>using FluentValidation;
+
+namespace Catalog.Application.Products.CreateProduct;
+
 public class CreateProductCommandHandler
 {
-    private readonly CreateProductService _createProductService;
+    private readonly ICreateProductService _service;
+    private readonly IValidator<CreateProductCommand> _validator;
 
-    public CreateProductCommandHandler(CreateProductService createProductService)
+    public CreateProductCommandHandler(
+        ICreateProductService service,
+        IValidator<CreateProductCommand> validator)
     {
-        _createProductService = createProductService;
+        _service = service;
+        _validator = validator;
     }
 
     public CreateProductResponse Handle(CreateProductCommand command)
@@ -3369,15 +3482,15 @@ public class CreateProductCommandHandler
             command.CatalogTypeId,
             command.CatalogBrandId);
 
-        return _createProductService.CreateProduct(request);
+        return _service.Execute(request);
     }
 }</code></pre>
                 </div>
 
-                <h3>FLUXO CONSTRUÍDO</h3>
-                <p>A execução do caso de uso agora opera através da cadeia explícita de comando, tratamento, orquestração e domínio:</p>
+                <h3>FLUXO CONSTRUÍDO COM A ABSTRAÇÃO</h3>
+                <p>A execução do caso de uso agora opera através da cadeia explícita de comando, tratamento, contrato abstrato, orquestração e domínio:</p>
 
-                <div class="visual-flow" style="margin:1.5rem 0;" aria-label="Fluxo completo construído com Command e Handler">
+                <div class="visual-flow" style="margin:1.5rem 0;" aria-label="Fluxo desacoplado com abstração ICreateProductService">
                     <div style="background:#eff6ff; border:1px solid var(--primary); padding:0.45rem 1.5rem; border-radius:6px; font-weight:600; color:var(--primary);">
                         CreateProductCommand
                         <div style="font-size:0.75rem; font-weight:normal; color:var(--text-light); margin-top:0.2rem;">Intenção / Ordem da ação</div>
@@ -3387,10 +3500,15 @@ public class CreateProductCommandHandler
                         CreateProductCommandHandler
                         <div style="font-size:0.75rem; font-weight:normal; color:var(--text-light); margin-top:0.2rem;">Recebe e trata o Command</div>
                     </div>
-                    <div class="arrow" style="font-size:1.4rem; color:var(--primary); font-weight:bold;">↓</div>
+                    <div class="arrow" style="font-size:1.4rem; color:var(--primary); font-weight:bold;">↓ (depende do contrato)</div>
+                    <div style="background:#fffbeb; border:2px dashed #f59e0b; padding:0.5rem 1.75rem; border-radius:6px; font-weight:700; color:#92400e;">
+                        ICreateProductService
+                        <div style="font-size:0.75rem; font-weight:normal; color:#b45309; margin-top:0.2rem;">Contrato explícito (Execute)</div>
+                    </div>
+                    <div class="arrow" style="font-size:1.4rem; color:#10b981; font-weight:bold;">↑ (implementa o contrato)</div>
                     <div style="background:#eff6ff; border:1px solid #3b82f6; padding:0.45rem 1.5rem; border-radius:6px; font-weight:600; color:#1d4ed8;">
                         CreateProductService
-                        <div style="font-size:0.75rem; font-weight:normal; color:var(--text-light); margin-top:0.2rem;">Coordena a execução do caso de uso</div>
+                        <div style="font-size:0.75rem; font-weight:normal; color:var(--text-light); margin-top:0.2rem;">Coordena a orquestração concreta</div>
                     </div>
                     <div class="arrow" style="font-size:1.4rem; color:var(--primary); font-weight:bold;">↓</div>
                     <div style="background:#ecfdf5; border:1px solid #10b981; padding:0.45rem 1.5rem; border-radius:6px; font-weight:600; color:#065f46;">
@@ -3414,11 +3532,30 @@ public class CreateProductCommandHandler
                         <span class="arch-label">Handler:</span> Quem recebe e trata aquela ordem, servindo de ponto de entrada da intenção.
                     </div>
                     <div class="arch-item">
-                        <span class="arch-label">Service:</span> Quem coordena a orquestração do caso de uso.
+                        <span class="arch-label">Interface (ICreateProductService):</span> O contrato formal que define as operações sem amarrar a implementação.
+                    </div>
+                    <div class="arch-item">
+                        <span class="arch-label">Service (CreateProductService):</span> Quem coordena a orquestração concreta do caso de uso implementando o contrato.
                     </div>
                     <div class="arch-item">
                         <span class="arch-label">Domain Entity:</span> Quem protege suas próprias regras e invariantes de negócio.
                     </div>
+                </div>
+
+                <div class="learning-box" style="border-left-color: #3b82f6; background: #eff6ff;">
+                    <h4 style="color: #1d4ed8;">🔌 Injeção de Dependências (DI) e Composição</h4>
+                    <p style="margin:0 0 0.5rem 0; font-size: 0.95rem; line-height: 1.6; color: #1e3a8a;">
+                        Como o <code>CreateProductCommandHandler</code> agora depende da interface <code>ICreateProductService</code> e a recebe via construtor, a amarração entre o contrato e a classe concreta será configurada na etapa de composição da aplicação/API:
+                    </p>
+                    <div class="code-container" style="margin: 0.75rem 0;">
+                        <div class="code-header">
+                            <span>Registro futuro no Container de DI (ex.: Program.cs da API)</span>
+                        </div>
+                        <pre><code>services.AddScoped&lt;ICreateProductService, CreateProductService&gt;();</code></pre>
+                    </div>
+                    <p style="margin:0; font-size: 0.88rem; line-height: 1.6; color: #1e40af;">
+                        ⚠️ <strong>Fronteira da Construção Atual:</strong> A configuração de DI no container da API <strong>AINDA NÃO foi implementada</strong> nesta etapa. Ela será devidamente registrada na composição do host da API quando esse módulo for construído.
+                    </p>
                 </div>
 
                 <div class="learning-box" style="border-left-color: #f59e0b; background: #fffbeb;">
@@ -3438,21 +3575,14 @@ public class CreateProductCommandHandler
                         <span class="arch-label">Sem Antecipações Prematuras:</span>
                         Para manter o compromisso de engenharia de só registrar o que realmente foi construído e testado, registramos expressamente que <strong>ainda NÃO foram implementados</strong>:
                         <ul style="margin:0.5rem 0 0 1.25rem; font-size:0.9rem; line-height:1.6;">
+                            <li><strong>Injeção de Dependências na API:</strong> O registro no container de DI (<code>services.AddScoped</code>) na camada de API ainda não foi implementado.</li>
+                            <li><strong>Validação FluentValidation Completa:</strong> A regra com <code>IValidator</code> está sendo estruturada, mas ainda não foi finalizada na camada (etapa em andamento).</li>
                             <li><strong>Mediator / MediatR:</strong> Nenhum pacote de mediação ou desacoplamento reflexivo foi adicionado ainda.</li>
                             <li><strong>CQRS Completo:</strong> Não há separação física de bancos de leitura/escrita nem queries segregadas ainda.</li>
                             <li><strong>Persistência / Banco de Dados:</strong> O produto ainda não é gravado em nenhum storage permanente.</li>
                             <li><strong>Repository:</strong> Nenhuma interface de repositório nem implementação de persistência foi criada nesta etapa.</li>
                             <li><strong>Entity Framework Core:</strong> Nenhum ORM foi referenciado ou configurado no projeto Application.</li>
                         </ul>
-                    </div>
-                </div>
-
-                <div class="arch-card" style="border-left-color: #10b981;">
-                    <h4>Decisão Arquitetural e Aprendizado</h4>
-                    <div class="arch-title">Justificativa por Problema, Não por Moda</div>
-                    <div class="arch-item">
-                        <span class="arch-label">Princípio Fundacional:</span>
-                        <em>"Não devemos criar componentes apenas por padrão. Neste laboratório, Command e Handler estão sendo introduzidos para compreender o fluxo de uma arquitetura baseada em comandos e preparar o terreno para avaliar o uso de Mediator. A adoção de cada tecnologia será justificada pelo problema que ela resolve."</em>
                     </div>
                 </div>
 
@@ -3469,7 +3599,7 @@ CAPÍTULO 3 → APLICAÇÃO
 3.4 Response                      ✅
 3.5 Service                       ✅
 3.6 Handler                       ✅
-3.7 Validação                     ⬅️ PRÓXIMO
+3.7 Validação                     ⬅️ EM ANDAMENTO
 3.8 Tratamento de erros
 3.9 Testando os casos de uso
                         </pre>
@@ -3489,12 +3619,12 @@ CAPÍTULO 3 → APLICAÇÃO
                         <span class="flow-arrow">→</span>
                         <span class="flow-step" style="background:#ecfdf5; color:#065f46; font-weight:700;">3.6 Handler ✅</span>
                         <span class="flow-arrow">→</span>
-                        <span class="flow-step" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">3.7 Validação ⬅️ PRÓXIMO</span>
+                        <span class="flow-step" style="background:#fffbeb; color:#92400e; border:1px solid #fde68a; font-weight:700;">3.7 Validação ⬅️ EM ANDAMENTO</span>
                     </div>
                 </div>
 
                 <h3>GANCHO PARA O PRÓXIMO PASSO</h3>
-                <p>Com a cadeia de execução (Command → Handler → Service → Entity → Response) devidamente articulada, o próximo passo essencial da engenharia de aplicação é garantir a consistência dos dados que chegam no comando antes de acionar o domínio: <strong>3.7 Validação</strong>.</p>
+                <p>Com a cadeia de execução desacoplada (Command → Handler → ICreateProductService / CreateProductService → Entity → Response) devidamente articulada, o próximo passo essencial da engenharia de aplicação é garantir a integridade dos dados que chegam no comando antes de acionar a orquestração e o domínio: <strong>3.7 Validação</strong>.</p>
 
                 <div class="section-nav-flow">
                     <a href="#cap-03-sec-05" onclick="navigateTo('cap-03-sec-05')">← Anterior: 3.5 Service</a>
@@ -3737,7 +3867,7 @@ app.Run();</code></pre>
                         { id: "cap-03-sec-04", num: "3.4", title: "3.4 Response", status: "concluido" },
                         { id: "cap-03-sec-05", num: "3.5", title: "3.5 Service", status: "concluido" },
                         { id: "cap-03-sec-06", num: "3.6", title: "3.6 Handler", status: "concluido" },
-                        { id: "cap-03-sec-07", num: "3.7", title: "3.7 Validação", status: "proximo" },
+                        { id: "cap-03-sec-07", num: "3.7", title: "3.7 Validação", status: "andamento" },
                         { id: "cap-03-sec-08", num: "3.8", title: "3.8 Tratamento de erros", status: "planejado" },
                         { id: "cap-03-sec-09", num: "3.9", title: "3.9 Testando os casos de uso", status: "planejado" }
                     ]
