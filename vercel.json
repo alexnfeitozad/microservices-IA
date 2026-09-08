@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/livro_vivo_de_engenharia.html" }
+  ]
+}
