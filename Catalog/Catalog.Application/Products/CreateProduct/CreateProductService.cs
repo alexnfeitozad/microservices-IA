@@ -3,18 +3,18 @@ using Catalog.Domain.Entities;
 
 namespace Catalog.Application.Products.CreateProduct
 {
-    public class CreateProductService
+    public class CreateProductService : ICreateProductService
     {
-        public CreateProductResponse CreateProduct(CreateProductRequest request)
+        public CreateProductResponse Execute(CreateProductRequest request)
         {
             var product = new Product(
-                Guid.NewGuid(),
-                request.Name,
-                request.Description,
-                request.Price,
-                request.PictureFileName,
-                request.CatalogTypeId,
-                request.CatalogBrandId);
+               Guid.NewGuid(),
+               request.Name,
+               request.Description,
+               request.Price,
+               request.PictureFileName,
+               request.CatalogTypeId,
+               request.CatalogBrandId);
 
             return new CreateProductResponse(
                 product.Id,

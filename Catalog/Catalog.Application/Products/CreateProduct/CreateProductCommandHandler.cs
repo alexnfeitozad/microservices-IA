@@ -5,11 +5,12 @@ namespace Catalog.Application.Products.CreateProduct
 {
     public class CreateProductCommandHandler
     {
-        private readonly CreateProductService _createProductService;
+        private readonly ICreateProductService _service;
         private readonly IValidator<CreateProductCommand> _validator;
-        public CreateProductCommandHandler(CreateProductService createProductService, IValidator<CreateProductCommand> validator)
+        public CreateProductCommandHandler(ICreateProductService createProductService,
+         IValidator<CreateProductCommand> validator)
         {
-            _createProductService = createProductService;
+            _service = createProductService;
             _validator = validator;
         }
 
@@ -25,7 +26,7 @@ namespace Catalog.Application.Products.CreateProduct
                 command.CatalogTypeId,
                 command.CatalogBrandId);
 
-            return _createProductService.CreateProduct(request);
+            return _service.Execute(request);
         }
     }
 }
