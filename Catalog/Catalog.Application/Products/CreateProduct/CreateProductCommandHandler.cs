@@ -14,7 +14,7 @@ namespace Catalog.Application.Products.CreateProduct
             _validator = validator;
         }
 
-        public CreateProductResponse Handle(CreateProductCommand command)
+        public CreateProductResponse Handle(CreateProductCommand command, CancellationToken none)
         {
             _validator.ValidateAndThrow(command);
             var request = new CreateProductRequest(

@@ -1,6 +1,6 @@
 using Catalog.Application.Products.CreateProduct;
 
-namespace Catalog.UnitTests.CreateProduto
+namespace Catalog.UnitTests.CreateProduct
 {
     public class CreateProductCommandValidatorTests
     {
