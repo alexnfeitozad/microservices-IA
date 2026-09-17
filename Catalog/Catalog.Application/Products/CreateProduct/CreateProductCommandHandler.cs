@@ -7,6 +7,7 @@ namespace Catalog.Application.Products.CreateProduct
     {
         private readonly ICreateProductService _service;
         private readonly IValidator<CreateProductCommand> _validator;
+
         public CreateProductCommandHandler(ICreateProductService createProductService,
          IValidator<CreateProductCommand> validator)
         {
@@ -14,9 +15,15 @@ namespace Catalog.Application.Products.CreateProduct
             _validator = validator;
         }
 
-        public CreateProductResponse Handle(CreateProductCommand command, CancellationToken none)
+        public CreateProductResponse Handle(CreateProductCommand command)
+        {
+            return Handle(command, CancellationToken.None);
+        }
+
+        public CreateProductResponse Handle(CreateProductCommand command, CancellationToken cancellationToken)
         {
             _validator.ValidateAndThrow(command);
+
             var request = new CreateProductRequest(
                 Guid.NewGuid(),
                 command.Name,
