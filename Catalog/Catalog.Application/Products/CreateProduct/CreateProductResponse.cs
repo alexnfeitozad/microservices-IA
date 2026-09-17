@@ -7,6 +7,10 @@ namespace Catalog.Application.Products.CreateProduct
         string Description,
         decimal Price,
         string PictureFileName,
-         int CatalogTypeId,
-    int CatalogBrandId);
+        int CatalogTypeId,
+        int CatalogBrandId)
+    {
+        // Alias de compatibilidade com o contrato antigo de testes e ensino.
+        public Guid ProductId => Id;
+    }
 }
